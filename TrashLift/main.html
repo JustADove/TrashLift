@@ -1199,8 +1199,9 @@
 
     <!-- COLLECTOR SCREEN (workers after login) -->
     <section class="screen" id="screen-collector">
-      <div class="screen-head">
+      <div class="screen-head" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
         <h2 class="screen-title">Kolektor view</h2>
+        <button type="button" id="clearAllBtn" class="danger" style="flex:none; padding:8px 12px; border-radius:10px; border:1px solid color-mix(in srgb, var(--clay) 35%, var(--card-border)); background:transparent; color:var(--clay); font-family:var(--font-body); font-weight:700; font-size:12.5px; cursor:pointer;">Clear all</button>
       </div>
       <div id="collectorList"></div>
     </section>
@@ -1461,6 +1462,19 @@
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
     }).then(function(data){ return data.photoUrl; });
+  }
+
+  function clearAllRequests(){
+    return fetch(apiUrl("/api/requests"), { method: "DELETE" })
+      .then(function(r){
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function(data){
+        setSyncUI(true);
+        applyServerState(data);
+        return data;
+      });
   }
 
   function startSyncLoop(){
@@ -2518,6 +2532,21 @@
     document.getElementById("accountSettingsBtn").addEventListener("click", function(){
       alert("Settings will be available in a future version.");
     });
+
+    var clearAllBtn = document.getElementById("clearAllBtn");
+    if (clearAllBtn){
+      clearAllBtn.addEventListener("click", function(){
+        if (!confirm("Delete ALL pickup requests for every user? This can't be undone.")) return;
+        clearAllBtn.disabled = true;
+        clearAllBtn.textContent = "Clearing…";
+        clearAllRequests()
+          .catch(function(){ alert("Couldn't reach the live server — check your connection and try again."); })
+          .then(function(){
+            clearAllBtn.disabled = false;
+            clearAllBtn.textContent = "Clear all";
+          });
+      });
+    }
 
     var credit = document.getElementById("team404");
     if (credit){
