@@ -45,7 +45,7 @@ function sendJson(res, code, obj){
   res.writeHead(code, {
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,POST,PATCH,OPTIONS",
+    "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Cache-Control": "no-store"
   });
@@ -157,6 +157,14 @@ async function handleApi(req, res, pathname){
       state.requests.unshift(body);
       saveState();
     }
+    sendJson(res, 200, { ok: true, requests: state.requests, locations: state.locations });
+    return;
+  }
+
+  if (pathname === "/api/requests" && req.method === "DELETE"){
+    state.requests = [];
+    state.locations = {};
+    saveState();
     sendJson(res, 200, { ok: true, requests: state.requests, locations: state.locations });
     return;
   }
