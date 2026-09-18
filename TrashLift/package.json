@@ -1,0 +1,12 @@
+{
+  "name": "trashlift",
+  "version": "1.0.0",
+  "description": "TrashLift — BF Homes trash pickup live-sync server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
