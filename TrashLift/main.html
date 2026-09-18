@@ -680,6 +680,22 @@
     color: var(--green-900);
   }
 
+  /* Clear-history button (Pick Up / Track page) */
+  .clear-history-btn{
+    width:100%;
+    margin:0 0 14px;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid color-mix(in srgb, var(--clay) 35%, var(--card-border));
+    background: var(--surface-card);
+    color: var(--clay);
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:13.5px;
+    cursor:pointer;
+  }
+  .clear-history-btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
   .empty-state{
     text-align:center;
     padding:32px 20px;
@@ -1157,6 +1173,7 @@
         <p class="screen-sub">Follow your pickup requests from here to done.</p>
         <div class="sync-pill" id="syncPillTrack"><span class="dot"></span><span class="sync-label">Connecting…</span></div>
       </div>
+      <button type="button" id="clearAllBtn" class="clear-history-btn">Clear all requests</button>
       <div id="trackList"></div>
     </section>
 
@@ -1199,9 +1216,8 @@
 
     <!-- COLLECTOR SCREEN (workers after login) -->
     <section class="screen" id="screen-collector">
-      <div class="screen-head" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+      <div class="screen-head">
         <h2 class="screen-title">Kolektor view</h2>
-        <button type="button" id="clearAllBtn" class="danger" style="flex:none; padding:8px 12px; border-radius:10px; border:1px solid color-mix(in srgb, var(--clay) 35%, var(--card-border)); background:transparent; color:var(--clay); font-family:var(--font-body); font-weight:700; font-size:12.5px; cursor:pointer;">Clear all</button>
       </div>
       <div id="collectorList"></div>
     </section>
@@ -2533,6 +2549,7 @@
       alert("Settings will be available in a future version.");
     });
 
+    // Clear-all lives on the Pick Up (Track) page
     var clearAllBtn = document.getElementById("clearAllBtn");
     if (clearAllBtn){
       clearAllBtn.addEventListener("click", function(){
@@ -2540,10 +2557,14 @@
         clearAllBtn.disabled = true;
         clearAllBtn.textContent = "Clearing…";
         clearAllRequests()
+          .then(function(){
+            // Track tab hides itself when there are no requests, so send the resident back to Request
+            if (state.user && state.user.role === "resident") goToScreen("screen-request");
+          })
           .catch(function(){ alert("Couldn't reach the live server — check your connection and try again."); })
           .then(function(){
             clearAllBtn.disabled = false;
-            clearAllBtn.textContent = "Clear all";
+            clearAllBtn.textContent = "Clear all requests";
           });
       });
     }
