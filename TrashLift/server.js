@@ -213,6 +213,21 @@ async function handleApi(req, res, pathname){
     return;
   }
 
+  if (pathname === "/api/admin/reset" && req.method === "GET"){
+    var parsedUrl = url.parse(req.url, true);
+    var key = parsedUrl.query && parsedUrl.query.key;
+    var RESET_KEY = process.env.RESET_KEY || "team404reset";
+    if (key !== RESET_KEY){
+      sendJson(res, 403, { error: "Wrong or missing key" });
+      return;
+    }
+    state.requests = [];
+    state.locations = {};
+    saveState();
+    sendJson(res, 200, { ok: true, message: "All requests and locations cleared." });
+    return;
+  }
+
   sendJson(res, 404, { error: "Unknown API route" });
 }
 
