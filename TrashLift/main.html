@@ -680,22 +680,6 @@
     color: var(--green-900);
   }
 
-  /* Clear-history button (Pick Up / Track page) */
-  .clear-history-btn{
-    width:100%;
-    margin:0 0 14px;
-    padding:12px 14px;
-    border-radius:12px;
-    border:1px solid color-mix(in srgb, var(--clay) 35%, var(--card-border));
-    background: var(--surface-card);
-    color: var(--clay);
-    font-family:var(--font-body);
-    font-weight:700;
-    font-size:13.5px;
-    cursor:pointer;
-  }
-  .clear-history-btn:disabled{ opacity:0.5; cursor:not-allowed; }
-
   .empty-state{
     text-align:center;
     padding:32px 20px;
@@ -1173,7 +1157,6 @@
         <p class="screen-sub">Follow your pickup requests from here to done.</p>
         <div class="sync-pill" id="syncPillTrack"><span class="dot"></span><span class="sync-label">Connecting…</span></div>
       </div>
-      <button type="button" id="clearAllBtn" class="clear-history-btn">Clear all requests</button>
       <div id="trackList"></div>
     </section>
 
@@ -1478,19 +1461,6 @@
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
     }).then(function(data){ return data.photoUrl; });
-  }
-
-  function clearAllRequests(){
-    return fetch(apiUrl("/api/requests"), { method: "DELETE" })
-      .then(function(r){
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
-      })
-      .then(function(data){
-        setSyncUI(true);
-        applyServerState(data);
-        return data;
-      });
   }
 
   function startSyncLoop(){
@@ -2548,26 +2518,6 @@
     document.getElementById("accountSettingsBtn").addEventListener("click", function(){
       alert("Settings will be available in a future version.");
     });
-
-    // Clear-all lives on the Pick Up (Track) page
-    var clearAllBtn = document.getElementById("clearAllBtn");
-    if (clearAllBtn){
-      clearAllBtn.addEventListener("click", function(){
-        if (!confirm("Delete ALL pickup requests for every user? This can't be undone.")) return;
-        clearAllBtn.disabled = true;
-        clearAllBtn.textContent = "Clearing…";
-        clearAllRequests()
-          .then(function(){
-            // Track tab hides itself when there are no requests, so send the resident back to Request
-            if (state.user && state.user.role === "resident") goToScreen("screen-request");
-          })
-          .catch(function(){ alert("Couldn't reach the live server — check your connection and try again."); })
-          .then(function(){
-            clearAllBtn.disabled = false;
-            clearAllBtn.textContent = "Clear all requests";
-          });
-      });
-    }
 
     var credit = document.getElementById("team404");
     if (credit){
