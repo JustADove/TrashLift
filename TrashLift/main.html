@@ -702,6 +702,204 @@
     color: var(--green-900);
   }
 
+  /* ---- Chat ---- */
+  .chat-open-btn{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:11px;
+    border-radius:12px;
+    border:1.5px solid var(--card-border);
+    background:transparent;
+    color: var(--text-primary);
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+    transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: 3px 3px 7px rgba(26,26,22,0.07);
+  }
+  .chat-open-btn:hover{
+    transform: translateY(-7px) scale(1.05);
+    box-shadow: 10px 12px 16px rgba(26,26,22,0.16);
+  }
+  .chat-open-btn:active{ transform: scale(0.97); }
+  .chat-open-btn svg{ flex:none; }
+
+  .chat-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:9500;
+    background: var(--surface-bg);
+    flex-direction:column;
+    isolation:isolate;
+  }
+  .chat-overlay.open{ display:flex; }
+  .chat-header{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding: calc(16px + env(safe-area-inset-top)) 16px 14px;
+    background: var(--mint);
+    color: var(--mint-ink);
+  }
+  .chat-back{
+    flex:none;
+    width:34px; height:34px;
+    border-radius:50%;
+    border:none;
+    background: rgba(255,255,255,0.5);
+    color: var(--mint-ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .chat-back:active{ transform: scale(0.92); }
+  .chat-header-info{ min-width:0; flex:1; }
+  .chat-header-name{
+    font-family:var(--font-body);
+    font-weight:800;
+    font-size:16.5px;
+    letter-spacing:-0.02em;
+    color: var(--mint-ink);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .chat-header-sub{
+    font-size:12px;
+    font-weight:600;
+    color: var(--mint-ink);
+    opacity:0.78;
+    margin-top:2px;
+  }
+  .chat-messages{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    padding:16px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    background-color: var(--surface-bg);
+    background-image: url("assets/trash-pattern.png");
+    background-repeat: repeat;
+    background-size: 240px auto;
+  }
+  .chat-empty{
+    margin:auto;
+    text-align:center;
+    font-size:13px;
+    color: var(--text-secondary);
+    max-width:28ch;
+    line-height:1.5;
+  }
+  .chat-msg{ display:flex; flex-direction:column; max-width:78%; }
+  .chat-msg.mine{ align-self:flex-end; align-items:flex-end; }
+  .chat-msg.theirs{ align-self:flex-start; align-items:flex-start; }
+  .chat-msg-name{
+    font-size:11px;
+    font-weight:700;
+    color: var(--text-secondary);
+    margin:0 4px 3px;
+  }
+  .chat-bubble{
+    border-radius:16px;
+    padding:10px 12px;
+    font-size:14px;
+    line-height:1.42;
+    box-shadow: 3px 3px 7px rgba(26,26,22,0.08);
+    border:1px solid var(--card-border);
+    background: var(--surface-card);
+    color: var(--text-primary);
+  }
+  .chat-msg.mine .chat-bubble{
+    background: var(--amber);
+    color: var(--green-900);
+    border-color: var(--amber);
+  }
+  .chat-bubble-text{ white-space:pre-wrap; word-break:break-word; }
+  .chat-bubble-photo{
+    display:block;
+    width:180px;
+    max-width:100%;
+    border-radius:12px;
+    margin-bottom:6px;
+    background:#1B1B16;
+  }
+  .chat-bubble-tag{
+    font-size:10.5px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color: var(--clay);
+    margin-bottom:5px;
+  }
+  .chat-msg.mine .chat-bubble-tag{ color: var(--green-900); opacity:0.75; }
+  .chat-bubble-time{
+    font-size:10px;
+    font-weight:600;
+    opacity:0.6;
+    margin-top:4px;
+    text-align:right;
+  }
+  .chat-status{
+    flex:0 0 auto;
+    font-size:11.5px;
+    font-weight:600;
+    color: var(--text-secondary);
+    text-align:center;
+    padding: 0 14px;
+    min-height:0;
+  }
+  .chat-status:not(:empty){ padding-bottom:6px; }
+  .chat-status.warn{ color: var(--clay); }
+  .chat-input-bar{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+    background: var(--surface-card);
+    border-top:1px solid var(--card-border);
+  }
+  .chat-photo-btn, .chat-send-btn{
+    flex:none;
+    width:42px; height:42px;
+    border-radius:50%;
+    border:1.5px solid var(--card-border);
+    background:transparent;
+    color: var(--text-primary);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+  }
+  .chat-send-btn{
+    background: var(--amber);
+    border-color: var(--amber);
+    color: var(--green-900);
+  }
+  .chat-photo-btn:active, .chat-send-btn:active{ transform: scale(0.92); }
+  .chat-text-input{
+    flex:1;
+    min-width:0;
+    padding:11px 14px;
+    border-radius:999px;
+    border:1.5px solid var(--card-border);
+    background: var(--surface-bg);
+    color: var(--text-primary);
+    font-family:var(--font-body);
+    font-size:14px;
+    outline:none;
+  }
+  .chat-text-input:focus{ border-color: var(--amber); }
+
   .empty-state{
     text-align:center;
     padding:32px 20px;
@@ -1328,6 +1526,29 @@
     </div>
   </div>
 
+  <div class="chat-overlay" id="chatOverlay" aria-hidden="true">
+    <div class="chat-header">
+      <button type="button" class="chat-back" id="chatBackBtn" aria-label="Back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+      </button>
+      <div class="chat-header-info">
+        <div class="chat-header-name" id="chatHeaderName">—</div>
+        <div class="chat-header-sub" id="chatHeaderSub">—</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-status" id="chatStatus"></div>
+    <div class="chat-input-bar">
+      <button type="button" class="chat-photo-btn" id="chatPhotoBtn" aria-label="Send live photo" title="Send live photo">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+      </button>
+      <input type="text" id="chatTextInput" class="chat-text-input" placeholder="Type a message…" autocomplete="off">
+      <button type="button" class="chat-send-btn" id="chatSendBtn" aria-label="Send message">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2z"></path></svg>
+      </button>
+    </div>
+  </div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 (function(){
@@ -1405,6 +1626,10 @@
     selectedType: null,
     requests: [],
     locations: {},
+    messageCounts: {},
+    messages: {},       // requestId -> [ message ]
+    activeChatId: null,
+    chatPollTimer: null,
     syncOk: false,
     syncTimer: null,
     map: null,
@@ -1419,10 +1644,14 @@
     lastPostedLoc: null,
     trashPhoto: null,
     cameraStream: null,
+    cameraMode: "pickup", // "pickup" | "chat"
     pendingRole: null,
     authMode: "login",
     user: null
   };
+
+  var CHAT_ICON_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
+  var CHAT_POLL_MS = 1500;
 
   // ---------- live sync API ----------
   function apiUrl(path){
@@ -1445,11 +1674,14 @@
     if (!payload) return;
     var next = Array.isArray(payload.requests) ? payload.requests : [];
     var locs = payload.locations && typeof payload.locations === "object" ? payload.locations : {};
+    var counts = payload.messageCounts && typeof payload.messageCounts === "object" ? payload.messageCounts : null;
     var sameReqs = JSON.stringify(next) === JSON.stringify(state.requests);
     var sameLocs = JSON.stringify(locs) === JSON.stringify(state.locations);
+    var sameCounts = counts ? JSON.stringify(counts) === JSON.stringify(state.messageCounts || {}) : true;
     state.requests = next;
     state.locations = locs;
-    if (!sameReqs){
+    if (counts) state.messageCounts = counts;
+    if (!sameReqs || !sameCounts){
       updateRoleUI();
       renderTrackList();
       renderCollectorList();
@@ -1549,6 +1781,47 @@
 
   function uploadPhoto(id, dataUrl){
     return fetch(apiUrl("/api/photos"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: id, dataUrl: dataUrl })
+    }).then(function(r){
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function(data){ return data.photoUrl; });
+  }
+
+  function fetchMessages(id){
+    return fetch(apiUrl("/api/messages/" + encodeURIComponent(id)), { cache: "no-store" })
+      .then(function(r){
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function(data){
+        state.messages[id] = Array.isArray(data.messages) ? data.messages : [];
+        renderChatMessages(id);
+      })
+      .catch(function(){ /* keep last-known messages, will retry on next poll */ });
+  }
+
+  function postMessageApi(msg){
+    return fetch(apiUrl("/api/messages"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(msg)
+    }).then(function(r){
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function(data){
+      setSyncUI(true);
+      if (Array.isArray(data.messages)) state.messages[msg.requestId] = data.messages;
+      if (data.requests) applyServerState(data);
+      renderChatMessages(msg.requestId);
+      return data;
+    });
+  }
+
+  function uploadChatPhoto(id, dataUrl){
+    return fetch(apiUrl("/api/chat-photos"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: id, dataUrl: dataUrl })
@@ -1899,6 +2172,7 @@
       window.scrollTo(0, parseInt(y, 10) || 0);
       delete document.body.dataset.camScrollY;
     }
+    state.cameraMode = "pickup";
   }
 
   function setCapturedPhoto(dataUrl){
@@ -1942,8 +2216,10 @@
   function captureLiveFrame(){
     var video = document.getElementById("cameraVideo");
     var canvas = document.getElementById("cameraCanvas");
+    var mode = state.cameraMode;
     if (!video.videoWidth){
-      showStatus("Camera is still starting — wait a second, then tap Take photo.", true);
+      var startingMsg = "Camera is still starting — wait a second, then tap Take photo.";
+      if (mode === "chat") showChatStatus(startingMsg, true); else showStatus(startingMsg, true);
       return;
     }
     var maxW = 960;
@@ -1954,15 +2230,170 @@
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     var dataUrl = canvas.toDataURL("image/jpeg", 0.72);
     closeCameraOverlay();
-    setCapturedPhoto(dataUrl);
-    showStatus("", false);
+    if (mode === "chat"){
+      sendChatPhoto(dataUrl);
+    } else {
+      setCapturedPhoto(dataUrl);
+      showStatus("", false);
+    }
   }
 
   function initCamera(){
-    document.getElementById("openCameraBtn").addEventListener("click", openLiveCamera);
-    document.getElementById("retakePhotoBtn").addEventListener("click", openLiveCamera);
+    document.getElementById("openCameraBtn").addEventListener("click", function(){
+      state.cameraMode = "pickup";
+      openLiveCamera();
+    });
+    document.getElementById("retakePhotoBtn").addEventListener("click", function(){
+      state.cameraMode = "pickup";
+      openLiveCamera();
+    });
     document.getElementById("cameraCancelBtn").addEventListener("click", closeCameraOverlay);
     document.getElementById("cameraShotBtn").addEventListener("click", captureLiveFrame);
+  }
+
+  // ---------- chat (resident ↔ collector, live once accepted) ----------
+  function showChatStatus(msg, warn){
+    var el = document.getElementById("chatStatus");
+    if (!el) return;
+    el.textContent = msg || "";
+    el.classList.toggle("warn", !!warn);
+  }
+
+  function chatTime(ts){
+    var d = new Date(ts);
+    var h = d.getHours(), m = d.getMinutes();
+    var ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12; if (h === 0) h = 12;
+    return h + ":" + (m < 10 ? "0" : "") + m + " " + ampm;
+  }
+
+  function renderChatMessages(id){
+    if (state.activeChatId !== id) return;
+    var wrap = document.getElementById("chatMessages");
+    if (!wrap) return;
+    var msgs = state.messages[id] || [];
+    if (!msgs.length){
+      wrap.innerHTML = '<div class="chat-empty">No messages yet. Say hello, or send a live photo once you\'re there.</div>';
+      return;
+    }
+    var mineRole = state.user ? state.user.role : null;
+    wrap.innerHTML = msgs.map(function(m){
+      var mine = m.sender === mineRole;
+      var photo = m.photoUrl ? '<img class="chat-bubble-photo" src="' + escapeHtml(m.photoUrl) + '" alt="Live photo">' : "";
+      var tag = m.isPickupPhoto ? '<div class="chat-bubble-tag">Live pickup photo</div>' : "";
+      var text = m.text ? '<div class="chat-bubble-text">' + escapeHtml(m.text) + '</div>' : "";
+      var name = !mine ? '<div class="chat-msg-name">' + escapeHtml(m.senderName || (m.sender === "worker" ? "Collector" : "Resident")) + '</div>' : "";
+      return '<div class="chat-msg ' + (mine ? "mine" : "theirs") + '">' + name +
+        '<div class="chat-bubble">' + tag + photo + text + '<div class="chat-bubble-time">' + chatTime(m.createdAt) + '</div></div>' +
+      '</div>';
+    }).join("");
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+
+  function stopChatPoll(){
+    if (state.chatPollTimer){ clearInterval(state.chatPollTimer); state.chatPollTimer = null; }
+  }
+
+  function startChatPoll(id){
+    stopChatPoll();
+    state.chatPollTimer = setInterval(function(){ fetchMessages(id); }, CHAT_POLL_MS);
+  }
+
+  function openChat(id){
+    var req = state.requests.filter(function(r){ return r.id === id; })[0];
+    if (!req) return;
+    state.activeChatId = id;
+    var isWorker = state.user && state.user.role === "worker";
+    var otherName = isWorker ? (req.residentName || "Resident") : (req.collector || "Collector");
+    document.getElementById("chatHeaderName").textContent = otherName;
+    document.getElementById("chatHeaderSub").textContent = req.typeLabel + " · Brgy. " + req.brgy;
+    document.getElementById("chatMessages").innerHTML = '<div class="chat-empty">Loading messages…</div>';
+    showChatStatus("");
+    var overlay = document.getElementById("chatOverlay");
+    overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden", "false");
+    fetchMessages(id);
+    startChatPoll(id);
+  }
+
+  function closeChat(){
+    stopChatPoll();
+    state.activeChatId = null;
+    var overlay = document.getElementById("chatOverlay");
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden", "true");
+  }
+
+  function sendChatText(){
+    var id = state.activeChatId;
+    if (!id || !state.user) return;
+    var input = document.getElementById("chatTextInput");
+    var text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    var msg = {
+      id: "m" + Date.now() + Math.random().toString(36).slice(2, 7),
+      requestId: id,
+      sender: state.user.role,
+      senderName: state.user.name,
+      text: text,
+      photoUrl: null,
+      createdAt: Date.now()
+    };
+    var list = state.messages[id] || (state.messages[id] = []);
+    list.push(msg);
+    renderChatMessages(id);
+    postMessageApi(msg).catch(function(){
+      showChatStatus("Message may not have sent — check connection.", true);
+    });
+  }
+
+  function sendChatPhoto(dataUrl){
+    var id = state.activeChatId;
+    if (!id || !state.user) return;
+    var msgId = "m" + Date.now() + Math.random().toString(36).slice(2, 7);
+    var isPickupPhoto = state.user.role === "worker";
+    showChatStatus("Uploading live photo…");
+    uploadChatPhoto(msgId, dataUrl).then(function(photoUrl){
+      var msg = {
+        id: msgId,
+        requestId: id,
+        sender: state.user.role,
+        senderName: state.user.name,
+        text: "",
+        photoUrl: photoUrl,
+        isPickupPhoto: isPickupPhoto,
+        createdAt: Date.now()
+      };
+      var list = state.messages[id] || (state.messages[id] = []);
+      list.push(msg);
+      renderChatMessages(id);
+      showChatStatus("");
+      return postMessageApi(msg);
+    }).catch(function(){
+      showChatStatus("Couldn't send the photo — check connection and try again.", true);
+    });
+  }
+
+  function openLiveCameraForChat(){
+    if (!state.activeChatId) return;
+    state.cameraMode = "chat";
+    openLiveCamera();
+  }
+
+  function wireChatButtons(wrap){
+    wrap.querySelectorAll("button[data-chat-id]").forEach(function(btn){
+      btn.addEventListener("click", function(){ openChat(btn.dataset.chatId); });
+    });
+  }
+
+  function initChat(){
+    document.getElementById("chatBackBtn").addEventListener("click", closeChat);
+    document.getElementById("chatSendBtn").addEventListener("click", sendChatText);
+    document.getElementById("chatTextInput").addEventListener("keydown", function(e){
+      if (e.key === "Enter"){ e.preventDefault(); sendChatText(); }
+    });
+    document.getElementById("chatPhotoBtn").addEventListener("click", openLiveCameraForChat);
   }
 
   function trashPhotoMarkup(r){
@@ -2440,6 +2871,13 @@
               : "Waiting for collector GPS… Allow location on the worker phone.") +
           "</div>";
       }
+      var msgCount = (state.messageCounts && state.messageCounts[r.id]) || 0;
+      var chatHtml = r.status !== "waiting"
+        ? '<div class="req-actions" style="margin-top:12px">' +
+            '<button type="button" class="chat-open-btn" data-chat-id="' + r.id + '">' + CHAT_ICON_SVG +
+            '<span>Message' + (msgCount ? " (" + msgCount + ")" : "") + '</span></button>' +
+          '</div>'
+        : "";
       return '<div class="req-card">' +
         '<div class="req-top">' +
           '<div class="req-type"><span class="dot" style="background:'+r.typeColor+'"></span>' + r.typeLabel + '</div>' +
@@ -2453,6 +2891,7 @@
         trashPhotoMarkup(r) +
         timelineMarkup(r.status) +
         (r.collector ? '<div class="req-note" style="margin-top:10px;">Collector: <strong>' + escapeHtml(r.collector) + '</strong></div>' : '') +
+        chatHtml +
         locHtml +
       '</div>';
     }).join("");
@@ -2468,6 +2907,7 @@
         });
       });
     });
+    wireChatButtons(wrap);
   }
 
   function renderCollectorList(){
@@ -2488,9 +2928,18 @@
       } else if (r.status === "accepted"){
         actionsHtml = '<div class="req-actions"><button data-action="enroute" data-id="'+r.id+'">Start heading over</button></div>';
       } else if (r.status === "enroute"){
-        actionsHtml = '<div class="req-actions"><button class="primary" data-action="done" data-id="'+r.id+'">Mark picked up</button></div>';
+        actionsHtml = r.driverPhotoConfirmed
+          ? '<div class="req-actions"><button class="primary" data-action="done" data-id="'+r.id+'">Mark picked up</button></div>'
+          : '<div class="req-actions"><button class="primary" data-action="chatphoto" data-id="'+r.id+'">Send live photo to confirm</button></div>';
       }
       var who = r.residentName ? '<div class="req-note" style="margin-top:8px;">From: <strong>' + escapeHtml(r.residentName) + '</strong></div>' : '';
+      var msgCount = (state.messageCounts && state.messageCounts[r.id]) || 0;
+      var chatHtml = r.status !== "waiting"
+        ? '<div class="req-actions" style="margin-top:10px">' +
+            '<button type="button" class="chat-open-btn" data-chat-id="' + r.id + '">' + CHAT_ICON_SVG +
+            '<span>Message' + (msgCount ? " (" + msgCount + ")" : "") + '</span></button>' +
+          '</div>'
+        : "";
       var mapsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(r.lat + "," + r.lng);
       var loc = state.locations[r.id];
       var showRoute = r.status === "accepted" || r.status === "enroute";
@@ -2522,6 +2971,7 @@
         trashPhotoMarkup(r) +
         who +
         timelineMarkup(r.status) +
+        chatHtml +
         mapHtml +
         actionsHtml;
       wrap.appendChild(card);
@@ -2532,6 +2982,10 @@
         var id = btn.dataset.id, action = btn.dataset.action;
         var req = state.requests.filter(function(r){ return r.id === id; })[0];
         if (!req) return;
+        if (action === "chatphoto"){
+          openChat(id);
+          return;
+        }
         btn.disabled = true;
         if (action === "done"){
           deleteRequestApi(id).catch(function(){
@@ -2555,6 +3009,7 @@
         });
       });
     });
+    wireChatButtons(wrap);
   }
 
   function escapeHtml(s){
@@ -2695,6 +3150,7 @@
     initCamera();
     initSubmit();
     initAuth();
+    initChat();
     initTabs();
     updateRoleUI();
     startSyncLoop();
