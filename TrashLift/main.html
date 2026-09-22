@@ -759,6 +759,41 @@
     padding: 16px 18px 14px;
     margin: 6px 0 14px;
   }
+  .screen-head-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .clear-all-btn{
+    flex:none;
+    margin-top:2px;
+    padding:8px 12px;
+    border-radius:10px;
+    border:1.5px solid rgba(22,52,43,0.25);
+    background:transparent;
+    color: var(--mint-ink);
+    font-family:var(--font-body);
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+  }
+  .clear-all-btn:active{ transform: scale(0.96); }
+  .req-delete-btn{
+    flex:none;
+    width:26px; height:26px;
+    border-radius:50%;
+    border:none;
+    background: rgba(26,26,22,0.06);
+    color: var(--text-secondary);
+    font-size:15px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .req-delete-btn:active{ transform: scale(0.9); }
   h2.screen-title{
     font-family:var(--font-body);
     font-weight:800;
@@ -1056,7 +1091,7 @@
     <section class="screen active" id="screen-home">
       <div class="home-hero">
         <div class="eyebrow">BF Homes</div>
-        <h2>Ano Kailangan Mo?</h2>
+        <h2>What Do You Need?</h2>
         <p>Log in to Collect or Pick up. Truck locations &amp; schedule are open to everyone — no account needed.</p>
       </div>
 
@@ -1067,7 +1102,7 @@
           </span>
           <span class="menu-text">
             <span class="menu-title">Collect</span>
-            <span class="menu-sub">Barangay worker — opens Kolektor view after login</span>
+            <span class="menu-sub">Barangay worker — opens Collector view after login</span>
           </span>
           <svg class="menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
         </button>
@@ -1137,7 +1172,7 @@
     <!-- REQUEST SCREEN (residents after login) -->
     <section class="screen" id="screen-request">
       <div class="screen-head">
-        <h2 class="screen-title">Saan ba tayo sundo?</h2>
+        <h2 class="screen-title">Where's the Pickup?</h2>
         <p class="screen-sub">Tap anywhere on the map, within BF Homes, to drop a pin — or use your current location.</p>
       </div>
 
@@ -1178,8 +1213,13 @@
     <!-- TRACK SCREEN (residents — unlocked after first request) -->
     <section class="screen" id="screen-track">
       <div class="screen-head">
-        <h2 class="screen-title">Mga kahilingan mo</h2>
-        <p class="screen-sub">Follow your pickup requests from here to done.</p>
+        <div class="screen-head-row">
+          <div>
+            <h2 class="screen-title">Your Requests</h2>
+            <p class="screen-sub">Follow your pickup requests from here to done.</p>
+          </div>
+          <button type="button" class="clear-all-btn" id="clearAllBtn">Clear all</button>
+        </div>
         <div class="sync-pill" id="syncPillTrack"><span class="dot"></span><span class="sync-label">Connecting…</span></div>
       </div>
       <div id="trackList"></div>
@@ -1225,7 +1265,7 @@
     <!-- COLLECTOR SCREEN (workers after login) -->
     <section class="screen" id="screen-collector">
       <div class="screen-head">
-        <h2 class="screen-title">Kolektor view</h2>
+        <h2 class="screen-title">Collector View</h2>
       </div>
       <div id="collectorList"></div>
     </section>
@@ -1251,7 +1291,7 @@
     </button>
     <button class="tab-btn" data-screen="screen-collector" style="display:none;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16"></path><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"></path></svg>
-      Kolektor
+      Collector
     </button>
   </nav>
 
@@ -1374,7 +1414,7 @@
     truckTimer: null,
     truckIdx: 0,
     trackMaps: {},      // requestId -> map entry
-    driverMaps: {},     // requestId -> map entry (Kolektor nav)
+    driverMaps: {},     // requestId -> map entry (Collector nav)
     geoWatchId: null,
     lastPostedLoc: null,
     trashPhoto: null,
@@ -1456,6 +1496,32 @@
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patch)
+    }).then(function(r){
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function(data){
+      setSyncUI(true);
+      applyServerState(data);
+      return data;
+    });
+  }
+
+  function deleteRequestApi(id){
+    return fetch(apiUrl("/api/requests/" + encodeURIComponent(id)), {
+      method: "DELETE"
+    }).then(function(r){
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).then(function(data){
+      setSyncUI(true);
+      applyServerState(data);
+      return data;
+    });
+  }
+
+  function clearAllRequestsApi(){
+    return fetch(apiUrl("/api/requests"), {
+      method: "DELETE"
     }).then(function(r){
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
@@ -1583,7 +1649,7 @@
     var sub = document.getElementById("authSub");
     if (role === "worker"){
       title.textContent = "Collect — log in";
-      sub.textContent = "Barangay workers unlock Kolektor view after logging in. Name only for this prototype.";
+      sub.textContent = "Barangay workers unlock Collector view after logging in. Name only for this prototype.";
     } else {
       title.textContent = "Pick up — log in";
       sub.textContent = "Residents unlock Request after logging in, then Track after sending a request.";
@@ -2377,7 +2443,10 @@
       return '<div class="req-card">' +
         '<div class="req-top">' +
           '<div class="req-type"><span class="dot" style="background:'+r.typeColor+'"></span>' + r.typeLabel + '</div>' +
-          '<div class="req-time">' + timeAgo(r.createdAt) + '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;">' +
+            '<div class="req-time">' + timeAgo(r.createdAt) + '</div>' +
+            '<button type="button" class="req-delete-btn" data-del-id="' + r.id + '" aria-label="Delete request" title="Delete">✕</button>' +
+          '</div>' +
         '</div>' +
         '<div class="req-coord">' + r.lat.toFixed(5) + '°N, ' + r.lng.toFixed(5) + '°E · Brgy. ' + escapeHtml(r.brgy) + '</div>' +
         (r.note ? '<div class="req-note">' + escapeHtml(r.note) + '</div>' : '') +
@@ -2388,6 +2457,17 @@
       '</div>';
     }).join("");
     mountTrackMaps();
+    wrap.querySelectorAll("button[data-del-id]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.dataset.delId;
+        if (!confirm("Delete this request? This can't be undone.")) return;
+        btn.disabled = true;
+        deleteRequestApi(id).catch(function(){
+          btn.disabled = false;
+          setSyncUI(false, "Delete failed — check server");
+        });
+      });
+    });
   }
 
   function renderCollectorList(){
@@ -2452,16 +2532,21 @@
         var id = btn.dataset.id, action = btn.dataset.action;
         var req = state.requests.filter(function(r){ return r.id === id; })[0];
         if (!req) return;
+        btn.disabled = true;
+        if (action === "done"){
+          deleteRequestApi(id).catch(function(){
+            btn.disabled = false;
+            setSyncUI(false, "Update failed — check server");
+          });
+          return;
+        }
         var patch = {};
         if (action === "accept"){
           patch.status = "accepted";
           patch.collector = (state.user && state.user.name) ? state.user.name : "Collector";
         } else if (action === "enroute"){
           patch.status = "enroute";
-        } else if (action === "done"){
-          patch.status = "done";
         }
-        btn.disabled = true;
         patchRequest(id, patch).then(function(){
           syncWorkerGeolocation();
         }).catch(function(){
@@ -2481,7 +2566,7 @@
   // Guest: Home + Schedule
   // Auth: only while logging in
   // After login: Home is locked until logout
-  // Request / Track: resident   |  Kolektor: worker
+  // Request / Track: resident   |  Collector: worker
   function roleHomeScreen(){
     if (state.user && state.user.role === "worker") return "screen-collector";
     if (state.user && state.user.role === "resident") return "screen-request";
@@ -2547,6 +2632,18 @@
         }
         // Switching role or first login — go through auth
         openAuth(role);
+      });
+    });
+
+    document.getElementById("clearAllBtn").addEventListener("click", function(){
+      if (!state.requests.length) return;
+      if (!confirm("Delete all requests? This can't be undone.")) return;
+      var btn = document.getElementById("clearAllBtn");
+      btn.disabled = true;
+      clearAllRequestsApi().catch(function(){
+        setSyncUI(false, "Clear failed — check server");
+      }).then(function(){
+        btn.disabled = false;
       });
     });
 
