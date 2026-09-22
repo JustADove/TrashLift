@@ -1,4 +1,7 @@
-
+/**
+ * TrashLift live sync server — shared requests + worker GPS for all devices.
+ * Serves main.html and /api/* endpoints. Zero npm deps (Node only).
+ */
 "use strict";
 
 var http = require("http");
@@ -12,7 +15,7 @@ var DATA_FILE = path.join(ROOT, "data", "state.json");
 
 var state = {
   requests: [],
-  locations: {} 
+  locations: {} // requestId -> { lat, lng, updatedAt, workerName }
 };
 
 function loadState(){
@@ -42,7 +45,7 @@ function sendJson(res, code, obj){
   res.writeHead(code, {
     "Content-Type": "application/json; charset=utf-8",
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,POST,PATCH,OPTIONS",
+    "Access-Control-Allow-Methods": "GET,POST,PATCH,DELETE,OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Cache-Control": "no-store"
   });
@@ -158,7 +161,39 @@ async function handleApi(req, res, pathname){
     return;
   }
 
+  if (pathname === "/api/requests" && req.method === "DELETE"){
+    state.requests.forEach(function(r){
+      try{
+        var p = photoPath(r.id);
+        if (fs.existsSync(p)) fs.unlinkSync(p);
+      }catch(e){}
+    });
+    state.requests = [];
+    state.locations = {};
+    saveState();
+    sendJson(res, 200, { ok: true, requests: state.requests, locations: state.locations });
+    return;
+  }
+
   var patchMatch = pathname.match(/^\/api\/requests\/([^/]+)$/);
+  if (patchMatch && req.method === "DELETE"){
+    var delId = decodeURIComponent(patchMatch[1]);
+    var before = state.requests.length;
+    state.requests = state.requests.filter(function(r){ return r.id !== delId; });
+    delete state.locations[delId];
+    if (state.requests.length === before){
+      sendJson(res, 404, { error: "Request not found" });
+      return;
+    }
+    try{
+      var delPhoto = photoPath(delId);
+      if (fs.existsSync(delPhoto)) fs.unlinkSync(delPhoto);
+    }catch(e){}
+    saveState();
+    sendJson(res, 200, { ok: true, requests: state.requests, locations: state.locations });
+    return;
+  }
+
   if (patchMatch && req.method === "PATCH"){
     var id = decodeURIComponent(patchMatch[1]);
     var patch = await readBody(req);
