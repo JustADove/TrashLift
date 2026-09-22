@@ -39,7 +39,7 @@
   }
 
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0;padding:0;overscroll-behavior:none;}
   body{
     background-color: var(--surface-bg);
     background-image: url("assets/trash-pattern.png");
@@ -57,7 +57,8 @@
   .shell{
     width:100%;
     max-width:440px;
-    min-height:100vh;
+    height:100vh;
+    height:100dvh;
     background-color: var(--surface-bg);
     background-image: url("assets/trash-pattern.png");
     background-repeat: repeat;
@@ -66,7 +67,7 @@
     display:flex;
     flex-direction:column;
     position:relative;
-    overflow-x:hidden;
+    overflow:hidden;
   }
 
   /* On roomier screens (this is a phone-app prototype viewed on desktop),
@@ -118,8 +119,10 @@
 
   main{
     flex:1;
+    min-height:0;
     padding: 4px 20px 100px;
     overflow-y:auto;
+    overscroll-behavior:contain;
   }
 
   .screen{ display:none; animation: fade-in .28s ease; }
@@ -637,22 +640,33 @@
     display:none;
     position:fixed;
     inset:0;
-    z-index:80;
+    z-index:99999;
     background:#0c1411;
     flex-direction:column;
+    /* isolate: nothing inside (or behind) can poke through regardless of its own z-index */
+    isolation:isolate;
+    overscroll-behavior:contain;
+    touch-action:none;
   }
   .camera-overlay.open{ display:flex; }
   .camera-overlay video{
-    flex:1;
+    flex:1 1 auto;
+    min-height:0;
     width:100%;
+    height:100%;
     object-fit:cover;
     background:#000;
+    display:block;
   }
   .camera-overlay .cam-bar{
+    flex:0 0 auto;
     display:flex;
     gap:10px;
     padding:14px 14px calc(16px + env(safe-area-inset-bottom));
+    padding-top:14px;
     background:#16342B;
+    position:relative;
+    z-index:1;
   }
   .camera-overlay .cam-bar button{
     flex:1;
@@ -672,6 +686,14 @@
   .camera-overlay .cam-shot{
     background: var(--amber);
     color: var(--green-900);
+  }
+
+  /* Lock the page behind the camera overlay so nothing scrolls/shifts under it */
+  body.cam-lock{
+    position:fixed;
+    inset:0;
+    width:100%;
+    overflow:hidden;
   }
 
   .req-actions button.primary{
@@ -926,6 +948,8 @@
   }
   .account-fab.visible{ display:flex; }
   .account-fab:active{ transform: scale(0.96); }
+  .account-fab.cam-hidden{ display:none !important; }
+  .account-fab svg{ width:24px; height:24px; }
 
   .account-sheet{
     position:absolute;
@@ -981,6 +1005,7 @@
     font-size:16px;
     flex:none;
   }
+  .account-avatar svg{ width:24px; height:24px; }
   .account-name{ font-weight:800; font-size:16px; margin:0; }
   .account-email{ font-size:12.5px; color: var(--text-secondary); margin:2px 0 0; font-weight:600; }
   .account-role{
@@ -1230,12 +1255,16 @@
     </button>
   </nav>
 
-  <button type="button" class="account-fab" id="accountFab" aria-label="Account" title="Account">?</button>
+  <button type="button" class="account-fab" id="accountFab" aria-label="Account" title="Account">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+  </button>
   <div class="account-backdrop" id="accountBackdrop"></div>
   <div class="account-sheet" id="accountSheet" aria-hidden="true">
     <div class="account-handle"></div>
     <div class="account-head">
-      <div class="account-avatar" id="accountAvatar">?</div>
+      <div class="account-avatar" id="accountAvatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
       <div>
         <p class="account-name" id="accountName">Guest</p>
         <p class="account-email" id="accountEmail">(Prototype: email not set)</p>
@@ -1517,8 +1546,6 @@
       return;
     }
     fab.classList.add("visible");
-    fab.textContent = initials(state.user.name);
-    document.getElementById("accountAvatar").textContent = initials(state.user.name);
     document.getElementById("accountName").textContent = state.user.name;
     document.getElementById("accountEmail").textContent =
       state.user.email || "(Prototype: email not set)";
@@ -1799,6 +1826,13 @@
     var overlay = document.getElementById("cameraOverlay");
     overlay.classList.remove("open");
     overlay.setAttribute("aria-hidden", "true");
+    document.getElementById("accountFab").classList.remove("cam-hidden");
+    var y = document.body.dataset.camScrollY;
+    document.body.classList.remove("cam-lock");
+    if (y != null){
+      window.scrollTo(0, parseInt(y, 10) || 0);
+      delete document.body.dataset.camScrollY;
+    }
   }
 
   function setCapturedPhoto(dataUrl){
@@ -1819,6 +1853,10 @@
       return;
     }
     var overlay = document.getElementById("cameraOverlay");
+    document.body.dataset.camScrollY = String(window.scrollY || window.pageYOffset || 0);
+    document.body.classList.add("cam-lock");
+    closeAccountSheet();
+    document.getElementById("accountFab").classList.add("cam-hidden");
     overlay.classList.add("open");
     overlay.setAttribute("aria-hidden", "false");
     navigator.mediaDevices.getUserMedia({
