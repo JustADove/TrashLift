@@ -15,7 +15,8 @@ var DATA_FILE = path.join(ROOT, "data", "state.json");
 
 var state = {
   requests: [],
-  locations: {} // requestId -> { lat, lng, updatedAt, workerName }
+  locations: {}, // requestId -> { lat, lng, updatedAt, workerName }
+  messages: {}   // requestId -> [ { id, sender, senderName, text, photoUrl, isPickupPhoto, createdAt } ]
 };
 
 function loadState(){
@@ -24,6 +25,7 @@ function loadState(){
       var raw = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
       state.requests = Array.isArray(raw.requests) ? raw.requests : [];
       state.locations = raw.locations && typeof raw.locations === "object" ? raw.locations : {};
+      state.messages = raw.messages && typeof raw.messages === "object" ? raw.messages : {};
     }
   }catch(e){
     console.warn("Could not load state:", e.message);
@@ -54,6 +56,7 @@ function sendJson(res, code, obj){
 
 var MAX_BODY = 6 * 1024 * 1024;
 var PHOTO_DIR = path.join(ROOT, "data", "photos");
+var CHAT_PHOTO_DIR = path.join(ROOT, "data", "chat-photos");
 
 function safePhotoId(id){
   return String(id || "").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80);
@@ -63,16 +66,45 @@ function photoPath(id){
   return path.join(PHOTO_DIR, safePhotoId(id) + ".jpg");
 }
 
-function savePhotoFromDataUrl(id, dataUrl){
+function chatPhotoPath(id){
+  return path.join(CHAT_PHOTO_DIR, safePhotoId(id) + ".jpg");
+}
+
+function saveJpegDataUrl(dir, id, dataUrl){
   var sid = safePhotoId(id);
   if (!sid) throw new Error("Invalid photo id");
   var m = String(dataUrl || "").match(/^data:image\/(?:jpeg|jpg|png|webp);base64,([A-Za-z0-9+/=]+)$/);
   if (!m) throw new Error("Need a camera JPEG");
   var buf = Buffer.from(m[1], "base64");
   if (!buf.length || buf.length > 2.5 * 1024 * 1024) throw new Error("Photo too large");
-  if (!fs.existsSync(PHOTO_DIR)) fs.mkdirSync(PHOTO_DIR, { recursive: true });
-  fs.writeFileSync(photoPath(sid), buf);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, sid + ".jpg"), buf);
+  return sid;
+}
+
+function savePhotoFromDataUrl(id, dataUrl){
+  var sid = saveJpegDataUrl(PHOTO_DIR, id, dataUrl);
   return "/photos/" + sid + ".jpg";
+}
+
+function saveChatPhotoFromDataUrl(id, dataUrl){
+  var sid = saveJpegDataUrl(CHAT_PHOTO_DIR, id, dataUrl);
+  return "/chat-photos/" + sid + ".jpg";
+}
+
+function deleteMessagesFor(requestId){
+  var list = state.messages[requestId];
+  if (Array.isArray(list)){
+    list.forEach(function(m){
+      if (m && m.photoUrl){
+        try{
+          var p = chatPhotoPath(m.id);
+          if (fs.existsSync(p)) fs.unlinkSync(p);
+        }catch(e){}
+      }
+    });
+  }
+  delete state.messages[requestId];
 }
 
 function readBody(req){
@@ -134,9 +166,14 @@ async function handleApi(req, res, pathname){
   }
 
   if (pathname === "/api/state" && req.method === "GET"){
+    var messageCounts = {};
+    Object.keys(state.messages).forEach(function(k){
+      messageCounts[k] = (state.messages[k] || []).length;
+    });
     sendJson(res, 200, {
       requests: state.requests,
       locations: state.locations,
+      messageCounts: messageCounts,
       serverTime: Date.now()
     });
     return;
@@ -167,9 +204,11 @@ async function handleApi(req, res, pathname){
         var p = photoPath(r.id);
         if (fs.existsSync(p)) fs.unlinkSync(p);
       }catch(e){}
+      deleteMessagesFor(r.id);
     });
     state.requests = [];
     state.locations = {};
+    state.messages = {};
     saveState();
     sendJson(res, 200, { ok: true, requests: state.requests, locations: state.locations });
     return;
@@ -189,6 +228,7 @@ async function handleApi(req, res, pathname){
       var delPhoto = photoPath(delId);
       if (fs.existsSync(delPhoto)) fs.unlinkSync(delPhoto);
     }catch(e){}
+    deleteMessagesFor(delId);
     saveState();
     sendJson(res, 200, { ok: true, requests: state.requests, locations: state.locations });
     return;
@@ -225,6 +265,60 @@ async function handleApi(req, res, pathname){
       saveState();
     }
     sendJson(res, 200, { ok: true, photoUrl: photoUrl });
+    return;
+  }
+
+  var msgListMatch = pathname.match(/^\/api\/messages\/([^/]+)$/);
+  if (msgListMatch && req.method === "GET"){
+    var mrid = decodeURIComponent(msgListMatch[1]);
+    sendJson(res, 200, { messages: state.messages[mrid] || [] });
+    return;
+  }
+
+  if (pathname === "/api/messages" && req.method === "POST"){
+    var msgBody = await readBody(req);
+    if (!msgBody || !msgBody.id || !msgBody.requestId || !msgBody.sender){
+      sendJson(res, 400, { error: "Missing message fields" });
+      return;
+    }
+    var list = state.messages[msgBody.requestId];
+    if (!list){ list = []; state.messages[msgBody.requestId] = list; }
+    var msgExists = list.some(function(m){ return m.id === msgBody.id; });
+    if (!msgExists){
+      var sender = msgBody.sender === "worker" ? "worker" : "resident";
+      var msg = {
+        id: String(msgBody.id),
+        sender: sender,
+        senderName: msgBody.senderName || null,
+        text: typeof msgBody.text === "string" ? msgBody.text.slice(0, 2000) : "",
+        photoUrl: msgBody.photoUrl || null,
+        isPickupPhoto: !!msgBody.isPickupPhoto,
+        createdAt: Date.now()
+      };
+      list.push(msg);
+      if (msg.isPickupPhoto && msg.sender === "worker"){
+        var linkedReq = state.requests.filter(function(r){ return r.id === msgBody.requestId; })[0];
+        if (linkedReq) linkedReq.driverPhotoConfirmed = true;
+      }
+      saveState();
+    }
+    sendJson(res, 200, {
+      ok: true,
+      messages: state.messages[msgBody.requestId],
+      requests: state.requests,
+      locations: state.locations
+    });
+    return;
+  }
+
+  if (pathname === "/api/chat-photos" && req.method === "POST"){
+    var cphotoBody = await readBody(req);
+    if (!cphotoBody.id || !cphotoBody.dataUrl){
+      sendJson(res, 400, { error: "Need id and camera photo" });
+      return;
+    }
+    var cPhotoUrl = saveChatPhotoFromDataUrl(cphotoBody.id, cphotoBody.dataUrl);
+    sendJson(res, 200, { ok: true, photoUrl: cPhotoUrl });
     return;
   }
 
@@ -266,6 +360,17 @@ var server = http.createServer(function(req, res){
   if (photoMatch){
     var file = photoPath(photoMatch[1]);
     fs.readFile(file, function(err, data){
+      if (err){ res.writeHead(404); res.end("Not found"); return; }
+      res.writeHead(200, { "Content-Type": "image/jpeg", "Cache-Control": "no-store" });
+      res.end(data);
+    });
+    return;
+  }
+
+  var chatPhotoMatch = pathname.match(/^\/chat-photos\/([a-zA-Z0-9_-]+)\.jpg$/);
+  if (chatPhotoMatch){
+    var cfile = chatPhotoPath(chatPhotoMatch[1]);
+    fs.readFile(cfile, function(err, data){
       if (err){ res.writeHead(404); res.end("Not found"); return; }
       res.writeHead(200, { "Content-Type": "image/jpeg", "Cache-Control": "no-store" });
       res.end(data);
