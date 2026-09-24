@@ -132,14 +132,15 @@
     animation: brandIn .6s cubic-bezier(.2,1.2,.3,1);
     box-shadow: 4px 6px 14px rgba(26,26,22,0.12);
   }
-  .wordmark-logo{
+  .wordmark-text{
     display:block;
-    height:38px;
-    width:auto;
-    max-width:66%;
-    object-fit:contain;
+    font-family:var(--font-display);
+    font-size:30px;
+    line-height:1;
+    letter-spacing:0.01em;
+    color: var(--mint-ink);
+    white-space:nowrap;
     transform-origin:50% 65%;
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.18));
     animation: logoWiggle 4.5s ease-in-out .6s infinite;
   }
   .wordmark small{
@@ -248,107 +249,213 @@
   }
   .locate-btn:active{ transform: scale(0.99); box-shadow: 2px 3px 6px rgba(26,26,22,0.10); }
 
-  /* ---- Home menu (Canva: mint cards, black type) ---- */
-  .home-hero{
-    border-radius: 28px;
-    background: var(--mint);
-    border: none;
-    padding:18px 20px 20px;
-    margin-top:10px;
-    color: var(--mint-ink);
-    animation: popIn .5s cubic-bezier(.2,1.2,.3,1) .05s both;
+  /* ---- Home: yellow wave, zig-zag green pills (per ui_format.png) ---- */
+  .shell.is-home,
+  .shell.is-auth{
+    background-color:#FFFFFF;
+    background-image:none;
+    animation:none;
   }
-  .home-hero .eyebrow{
-    font-size:14px;
-    font-weight:600;
-    color: var(--mint-ink);
-    opacity:0.88;
-  }
-  .home-hero h2{
-    font-family:var(--font-body);
-    font-weight:800;
-    font-size:26px;
-    margin:4px 0 8px;
-    line-height:1.12;
-    letter-spacing:-0.03em;
-    color: var(--mint-ink);
-  }
-  .home-hero p{
-    font-size:13.5px;
-    color: var(--mint-ink);
-    line-height:1.45;
-    margin:0;
-    max-width:36ch;
-    opacity:0.92;
+  .shell.is-home header.topbar,
+  .shell.is-home nav.tabbar,
+  .shell.is-auth header.topbar,
+  .shell.is-auth nav.tabbar{ display:none; }
+  .shell.is-home main,
+  .shell.is-auth main{
+    position:relative;
+    padding:0;
+    overflow:hidden;
   }
 
-  .menu-list{
+  #screen-home{
+    --home-green:#7CC644;
+    --home-orange:#FFBD59;
+    --home-white:#FCFFFF;
+    --btn-h: clamp(48px, 7vh, 62px);
+    --play: paused;               /* flipped to "running" once the intro splash is gone */
+    position:absolute;
+    inset:0;
+  }
+  html.intro-done #screen-home{ --play: running; }
+
+  /* Yellow background: wipes in left -> right */
+  .home-yellow{
+    position:absolute;
+    inset:0;
+    background:#FFEB5B;
+    pointer-events:none;
+    animation: yellowWipe .9s cubic-bezier(.65,0,.25,1) backwards;
+    animation-play-state: var(--play);
+  }
+  @keyframes yellowWipe{
+    from{ clip-path: inset(0 100% 0 0); }
+    to{   clip-path: inset(0 0 0 0); }
+  }
+  .home-wave{
+    position:absolute;
+    left:0; top:0;
+    width:100%;
+    height:39.5%;
+    display:block;
+    pointer-events:none;
+  }
+  .home-title,
+  .auth-title{
+    position:absolute;
+    left:7.6%;
+    top:3.4%;
+    margin:0;
+    z-index:2;
+    font-family:var(--font-display);
+    font-weight:400;
+    font-size:clamp(22px, 3.7vh, 28px);
+    line-height:1;
+    letter-spacing:0.01em;
+    color:#111;
+  }
+  /* Typewriter: each letter pops in one after another, with a caret that follows */
+  .tw-ch{
+    --t0: .55s;                   /* when typing starts */
+    --step: .1s;                  /* time per letter */
+    position:relative;
+    display:inline-block;
+    white-space:pre;
+    opacity:0;
+    animation: twIn .01s linear forwards;
+    animation-delay: calc(var(--t0) + var(--i) * var(--step));
+    animation-play-state: var(--play);
+  }
+  .tw-ch::after{
+    content:"";
+    position:absolute;
+    left:100%;
+    top:6%;
+    height:88%;
+    width:2px;
+    margin-left:1px;
+    background:#111;
+    opacity:0;
+    animation: twCaret var(--step) steps(1) forwards;
+    animation-delay: calc(var(--t0) + var(--i) * var(--step));
+    animation-play-state: var(--play);
+  }
+  .tw-ch:last-child::after{
+    animation: twCaretEnd 1.3s steps(1) forwards;
+    animation-delay: calc(var(--t0) + var(--i) * var(--step));
+    animation-play-state: var(--play);
+  }
+  @keyframes twIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes twCaret{ 0%,99%{ opacity:1; } 100%{ opacity:0; } }
+  @keyframes twCaretEnd{
+    0%{ opacity:1; } 20%{ opacity:0; } 40%{ opacity:1; }
+    60%{ opacity:0; } 80%{ opacity:1; } 100%{ opacity:0; }
+  }
+
+  .home-menu{
+    position:absolute;
+    left:0; right:0;
+    top:42.2%;
     display:flex;
     flex-direction:column;
-    gap:12px;
-    margin-top:16px;
-    padding: 8px 6px 14px;
+    gap: clamp(20px, 4.8vh, 40px);
   }
   .menu-card{
-    --accent: #1B7A3A;
+    --ic: calc(var(--btn-h) - 11px);
     display:flex;
     align-items:center;
-    gap:14px;
-    width:100%;
-    text-align:left;
-    padding:12px 16px 12px 12px;
-    border-radius: 28px;
-    border: none;
-    background: var(--mint);
-    color: var(--mint-ink);
+    width:63.4%;
+    height:var(--btn-h);
+    padding:0 12px 0 calc((var(--btn-h) - var(--ic)) / 2);
+    border:none;
+    border-radius: calc(var(--btn-h) * .3);
+    background: var(--home-green);
+    color:#111;
     cursor:pointer;
     font-family:var(--font-body);
-    animation: popIn .5s cubic-bezier(.2,1.2,.3,1) both;
+    animation: panFromRight .7s cubic-bezier(.2,.9,.25,1) backwards;
+    animation-play-state: var(--play);
     transition: transform .18s ease, box-shadow .18s ease;
-    box-shadow: 4px 5px 10px rgba(26,26,22,0.10);
+    box-shadow: 0 3px 8px rgba(70,110,20,0.18);
     position:relative;
   }
-  .menu-card:nth-child(1){ animation-delay:.12s; }
-  .menu-card:nth-child(2){ animation-delay:.2s; }
-  .menu-card:nth-child(3){ animation-delay:.28s; }
+  .menu-card.to-right{ margin-left:auto; margin-right:3.2%; }
+  .menu-card.to-left{ margin-left:5.4%; animation-name: panFromLeft; }
+  .menu-card:nth-child(1){ animation-delay:.75s; }
+  .menu-card:nth-child(2){ animation-delay:.93s; }
+  .menu-card:nth-child(3){ animation-delay:1.11s; }
+  @keyframes panFromRight{
+    from{ transform: translateX(125%); opacity:0; }
+    35%{ opacity:1; }
+    to{ transform: none; opacity:1; }
+  }
+  @keyframes panFromLeft{
+    from{ transform: translateX(-125%); opacity:0; }
+    35%{ opacity:1; }
+    to{ transform: none; opacity:1; }
+  }
   .menu-card:hover{
     z-index:2;
-    transform: translateY(-12px) scale(1.055);
-    box-shadow: 14px 16px 24px rgba(26,26,22,0.22);
+    transform: translateY(-6px) scale(1.04);
+    box-shadow: 8px 12px 18px rgba(70,110,20,0.28);
   }
-  .menu-card:active{ transform: scale(0.97); box-shadow: 2px 3px 6px rgba(26,26,22,0.12); }
-  .menu-card:focus-visible{ outline:2px solid var(--mint-ink); outline-offset:3px; }
-  .menu-card .menu-icon{
+  .menu-card:active{ transform: scale(0.97); box-shadow: 0 2px 4px rgba(70,110,20,0.2); }
+  .menu-card:focus-visible,
+  .home-settings:focus-visible{ outline:3px solid #111; outline-offset:3px; }
+
+  .menu-icon{
     flex:none;
-    width:58px;
-    height:58px;
+    width:var(--ic, 35px);
+    height:var(--ic, 35px);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background: var(--home-white);
+  }
+  .menu-icon svg{ width:68%; height:68%; fill: var(--home-orange); display:block; }
+  .menu-icon .hole{ fill: var(--home-white); }
+  .menu-title{
+    flex:1;
+    min-width:0;
+    text-align:center;
+    font-size: calc(var(--btn-h) * .48);
+    font-weight:400;
+    line-height:1;
+    color:#111;
+    padding-right:6px;
+    white-space:nowrap;
+  }
+  .menu-title.small{
+    font-size: calc(var(--btn-h) * .28);
+    -webkit-text-stroke: .6px #111;
+  }
+
+  .home-settings{
+    --set-h: clamp(52px, 8.5vh, 66px);
+    --ic: calc(var(--set-h) - 13px);
+    position:absolute;
+    left:8px; right:8px;
+    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    height:var(--set-h);
+    border:none;
     border-radius:16px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background: #fff;
-    color: #1B7A3A;
-    box-shadow: 0 1px 0 rgba(17,17,17,0.06);
+    background: var(--home-green);
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+    box-shadow: 0 3px 8px rgba(70,110,20,0.18);
+    transition: transform .18s ease, box-shadow .18s ease;
+    animation: riseUp .7s cubic-bezier(.2,1.1,.3,1) 1.3s backwards;
+    animation-play-state: var(--play);
   }
-  .menu-card .menu-icon svg{ width:30px; height:30px; }
-  .menu-card .menu-text{ flex:1; min-width:0; }
-  .menu-card .menu-title{
-    display:block;
-    font-weight:800;
-    font-size:16.5px;
-    color: var(--mint-ink);
-    letter-spacing:-0.02em;
+  @keyframes riseUp{
+    from{ transform: translateY(160%); opacity:0; }
+    30%{ opacity:1; }
+    to{ transform: none; opacity:1; }
   }
-  .menu-card .menu-sub{
-    display:block;
-    font-size:12px;
-    font-weight:600;
-    color: var(--mint-ink);
-    opacity:0.78;
-    margin-top:2px;
-    line-height:1.35;
-  }
-  .menu-card .menu-chevron{ display:none; }
+  .home-settings:hover{ transform: translateY(-3px); box-shadow: 6px 10px 16px rgba(70,110,20,0.26); }
+  .home-settings:active{ transform: scale(0.98); }
+  .home-settings .menu-icon svg{ transition: transform .5s ease; }
+  .home-settings:hover .menu-icon svg{ transform: rotate(60deg); }
 
   @keyframes popIn{
     from{ opacity:0; transform:translateY(14px) scale(.97); }
@@ -356,32 +463,34 @@
   }
 
   .home-footnote{
-    --c404-a: #1A1A16;
+    --c404-a: #111111;
     --c404-b: #3E8E6A;
     --c404-c: #1B7A3A;
-    --c404-glow: #C5E07A;
+    --c404-glow: #FFFFFF;
+    position:absolute;
+    left:0; right:0;
+    bottom: calc(clamp(52px, 8.5vh, 66px) + 24px + env(safe-area-inset-bottom, 0px));
     text-align:center;
-    margin:28px 0 10px;
     cursor:pointer;
     user-select:none;
-    animation: popIn .55s cubic-bezier(.2,1.2,.3,1) .4s both;
+    animation: popIn .55s cubic-bezier(.2,1.2,.3,1) 1.75s backwards;
+    animation-play-state: var(--play);
   }
   .home-footnote .fn-by{
     display:block;
-    font-size:13px;
+    font-size:12px;
     font-weight:700;
-    color: var(--c404-c);
+    color: #111;
+    opacity:.7;
     letter-spacing:0.04em;
-    transition: color .25s ease;
   }
   .home-footnote .fn-404{
     display:inline-block;
     margin-top:2px;
     font-family:var(--font-body);
-    font-size:28px;
+    font-size:24px;
     font-weight:800;
     letter-spacing:0.08em;
-    color: var(--mint-ink);
     background: linear-gradient(90deg, var(--c404-a) 0%, var(--c404-b) 40%, var(--c404-c) 70%, var(--c404-a) 100%);
     background-size: 220% 100%;
     -webkit-background-clip:text;
@@ -389,7 +498,6 @@
     -webkit-text-fill-color:transparent;
     animation: teamFloat 2.8s ease-in-out infinite, teamShine 3.6s linear infinite;
     filter: drop-shadow(0 2px 0 var(--c404-glow));
-    transition: filter .25s ease;
   }
   .home-footnote.bounce .fn-404{ animation: teamBounce .55s cubic-bezier(.2,1.4,.3,1); }
   @keyframes teamFloat{
@@ -406,10 +514,22 @@
     65%{ transform: scale(0.94) rotate(4deg); }
     100%{ transform: scale(1); }
   }
+  /* After the load sequence has played, drop it so returning to Home doesn't replay it */
+  #screen-home.settled .home-yellow,
+  #screen-home.settled .tw-ch,
+  #screen-home.settled .tw-ch::after,
+  #screen-home.settled .menu-card,
+  #screen-home.settled .home-settings,
+  #screen-home.settled .home-footnote{ animation:none; }
+  #screen-home.settled .tw-ch{ opacity:1; }
+
   @media (prefers-reduced-motion: reduce){
-    .wordmark, .wordmark-logo, .wordmark small, .home-hero, .menu-card, .home-footnote, .home-footnote .fn-404, header.topbar::before{
+    .wordmark, .wordmark-text, .wordmark small, .home-yellow, .menu-card, .home-settings, .home-footnote, .home-footnote .fn-404, header.topbar::before,
+    .tw-ch, .tw-ch::after{
       animation:none;
     }
+    .tw-ch{ opacity:1; }
+    .tw-ch::after{ display:none; }
   }
 
   /* ---- Sections ---- */
@@ -690,6 +810,69 @@
     background: var(--amber);
     border-color: var(--amber);
     color: var(--green-900);
+  }
+
+  /* ---- AI trash camera ---- */
+  .camera-card.ai-bad{ border-color: var(--clay); }
+  .camera-card.ai-ok{ border-color: var(--mint-deep); }
+  .scan-wrap{ position:relative; }
+  .scan-fx{ position:absolute; inset:0; border-radius:12px; overflow:hidden; display:none; pointer-events:none; }
+  .scan-wrap.scanning .scan-fx{ display:block; }
+  .scan-fx::before{ content:""; position:absolute; inset:0; background:rgba(12,20,17,0.38); }
+  .scan-fx::after{
+    content:""; position:absolute; inset:8px;
+    background:
+      linear-gradient(var(--mint),var(--mint)) top left / 22px 3px no-repeat,
+      linear-gradient(var(--mint),var(--mint)) top left / 3px 22px no-repeat,
+      linear-gradient(var(--mint),var(--mint)) top right / 22px 3px no-repeat,
+      linear-gradient(var(--mint),var(--mint)) top right / 3px 22px no-repeat,
+      linear-gradient(var(--mint),var(--mint)) bottom left / 22px 3px no-repeat,
+      linear-gradient(var(--mint),var(--mint)) bottom left / 3px 22px no-repeat,
+      linear-gradient(var(--mint),var(--mint)) bottom right / 22px 3px no-repeat,
+      linear-gradient(var(--mint),var(--mint)) bottom right / 3px 22px no-repeat;
+  }
+  .scan-line{
+    position:absolute; left:0; right:0; top:0; height:3px; z-index:1;
+    background:linear-gradient(90deg, transparent, var(--mint), transparent);
+    box-shadow:0 0 14px 4px rgba(197,224,122,0.75);
+    animation: scanMove 1.2s ease-in-out infinite alternate;
+  }
+  @keyframes scanMove{ from{ top:0; } to{ top:calc(100% - 3px); } }
+  .ai-stamp{
+    position:absolute; left:50%; top:50%; display:none; white-space:nowrap; pointer-events:none;
+    padding:6px 16px; border:4px solid #fff; border-radius:10px;
+    background:var(--clay); color:#fff; font-weight:900; font-size:28px; letter-spacing:.06em;
+    box-shadow:0 6px 18px rgba(0,0,0,0.4);
+    transform:translate(-50%,-50%) rotate(-8deg);
+  }
+  .ai-stamp.show{ display:block; animation: stampIn .28s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes stampIn{
+    from{ transform:translate(-50%,-50%) rotate(-8deg) scale(2.2); opacity:0; }
+    to{ transform:translate(-50%,-50%) rotate(-8deg) scale(1); opacity:1; }
+  }
+  .ai-tag{
+    position:absolute; left:8px; bottom:8px; display:none; align-items:center; gap:7px;
+    padding:6px 12px; border-radius:999px; background:rgba(12,20,17,0.82); color:#fff;
+    font-weight:800; font-size:12.5px; pointer-events:none;
+  }
+  .ai-tag.show{ display:inline-flex; }
+  .ai-tag .dot{ width:10px; height:10px; border-radius:50%; background:var(--mint); }
+  .ai-result{
+    display:none; margin-top:10px; padding:10px 12px; border-radius:12px;
+    font-size:13px; line-height:1.4; color:var(--text-primary);
+    border:1.5px solid var(--card-border); background:#F4F4EE;
+  }
+  .ai-result.show{ display:block; }
+  .ai-result .ai-title{ font-weight:900; font-size:14px; letter-spacing:.02em; }
+  .ai-result .ai-body{ margin-top:2px; color:var(--text-secondary); }
+  .ai-result.scanning{ background:#F4F4EE; }
+  .ai-result.ok{ background:rgba(197,224,122,0.35); border-color:var(--mint-deep); }
+  .ai-result.bad{ background:rgba(193,84,47,0.10); border-color:var(--clay); }
+  .ai-result.bad .ai-title{ color:var(--clay); }
+  .ai-result.warn{ background:rgba(233,162,59,0.16); border-color:var(--amber); }
+  @media (prefers-reduced-motion: reduce){
+    .scan-line{ animation:none; top:50%; }
+    .ai-stamp.show{ animation:none; }
   }
 
   .camera-overlay{
@@ -1064,90 +1247,203 @@
     opacity:0.88;
   }
 
-  /* ---- Auth ---- */
-  .auth-card{
-    margin-top:8px;
-    border-radius: var(--radius-card);
-    background: var(--surface-card);
-    border:1px solid var(--card-border);
-    padding:20px 18px 22px;
+  /* Buttons lift on hover; extend their hit area downward so hovering the bottom edge doesn't flicker */
+  .menu-card::after,
+  .home-settings::after,
+  .auth-back::after,
+  .auth-submit::after{
+    content:"";
+    position:absolute;
+    left:0; right:0;
+    top:100%;
+    height:10px;
   }
+
+  /* ---- Auth (log in / sign up): green wave top, yellow wave bottom, orange pills (per Sign_up.png) ---- */
+  #screen-auth{
+    --play: running;
+    --orange:#FFBD59;
+    --green:#7CC644;
+    --white:#FCFFFF;
+    --home-orange:#FFBD59;        /* shared .menu-icon styles read these */
+    --home-white:#FCFFFF;
+    --fh: clamp(42px, 5.9vh, 56px);        /* input height */
+    --fgap: clamp(18px, 5.4vh, 44px);      /* gap between inputs */
+    --set-h: clamp(52px, 8.5vh, 66px);     /* submit bar height */
+    position:absolute;
+    inset:0;
+  }
+  .auth-top, .auth-bottom{
+    position:absolute;
+    left:0;
+    width:100%;
+    display:block;
+    pointer-events:none;
+  }
+  .auth-top{
+    top:0; height:34%;
+    animation: authWipeL .85s cubic-bezier(.65,0,.25,1) backwards;
+  }
+  .auth-bottom{
+    bottom:0; height:33.3%;
+    animation: authWipeR .85s cubic-bezier(.65,0,.25,1) .1s backwards;
+  }
+  @keyframes authWipeL{ from{ clip-path: inset(0 100% 0 0); } to{ clip-path: inset(0 0 0 0); } }
+  @keyframes authWipeR{ from{ clip-path: inset(0 0 0 100%); } to{ clip-path: inset(0 0 0 0); } }
+
+  .auth-disc{
+    position:absolute;
+    width:33.3%;
+    aspect-ratio: 2 / 1;
+    background: var(--orange);
+    pointer-events:none;
+  }
+  .auth-disc-top{
+    left:4.3%; top:22.3%;
+    border-radius: 0 0 999px 999px;
+    animation: discDrop .6s cubic-bezier(.2,1.1,.3,1) .7s backwards;
+  }
+  .auth-disc-bottom{
+    right:4.3%; top:69.9%;
+    border-radius: 999px 999px 0 0;
+    animation: discRise .6s cubic-bezier(.2,1.1,.3,1) .9s backwards;
+  }
+  @keyframes discDrop{ from{ transform: translateY(-160%); opacity:0; } 30%{ opacity:1; } to{ transform:none; opacity:1; } }
+  @keyframes discRise{ from{ transform: translateY(160%); opacity:0; } 30%{ opacity:1; } to{ transform:none; opacity:1; } }
+
+  .auth-title{ top:4.6%; white-space:nowrap; }
+  .auth-sr{
+    position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0;
+    overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;
+  }
+
   .auth-tabs{
+    position:absolute;
+    left:7.6%;
+    top:12.2%;
     display:flex;
-    gap:6px;
-    padding:4px;
-    border-radius:12px;
-    background: color-mix(in srgb, var(--ink) 6%, transparent);
-    margin-bottom:18px;
+    gap:4px;
+    padding:3px;
+    border-radius:999px;
+    background: rgba(255,255,255,0.38);
+    animation: panFromLeft .6s cubic-bezier(.2,.9,.25,1) .8s backwards;
   }
   .auth-tabs button{
-    flex:1;
+    --th: clamp(28px, 4.4vh, 38px);
+    height:var(--th);
+    padding:0 calc(var(--th) * .55);
     border:none;
+    border-radius:999px;
     background:transparent;
-    color: var(--text-secondary);
+    color:#111;
     font-family:var(--font-body);
-    font-weight:800;
-    font-size:13.5px;
-    padding:10px 8px;
-    border-radius:10px;
+    font-size: calc(var(--th) * .46);
+    line-height:1;
     cursor:pointer;
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+    transition: background .18s ease, transform .18s ease;
   }
-  .auth-tabs button:hover{
-    transform: translateY(-5px) scale(1.04);
-    box-shadow: 8px 10px 14px rgba(26,26,22,0.14);
+  .auth-tabs button:hover{ transform: translateY(-2px); }
+  .auth-tabs button.active{ background: var(--white); }
+  .auth-tabs button:focus-visible{ outline:3px solid #111; outline-offset:2px; }
+
+  .auth-form{ display:contents; }
+  .auth-fields{
+    position:absolute;
+    left:0; right:0;
+    top:35.7%;
+    display:flex;
+    flex-direction:column;
+    gap:var(--fgap);
   }
-  .auth-tabs button.active{
-    background: var(--surface-card);
-    color: var(--text-primary);
-    box-shadow: 4px 4px 8px rgba(0,0,0,0.08);
+  .auth-slot{
+    position:relative;
+    width:67%;
+    animation: panFromLeft .7s cubic-bezier(.2,.9,.25,1) backwards;
   }
-  .field{ margin-bottom:14px; }
-  .field label{
+  .auth-slot.to-left{ margin-left:4.4%; }
+  .auth-slot.to-right{ margin-left:auto; margin-right:3.2%; animation-name: panFromRight; }
+  .auth-field{
     display:block;
-    font-size:12.5px;
-    font-weight:700;
-    color: var(--text-secondary);
-    margin-bottom:6px;
-  }
-  .field label .req{ color: var(--clay); }
-  .field input{
     width:100%;
-    padding:13px 14px;
-    border-radius:12px;
-    border:1.5px solid var(--card-border);
-    background: var(--surface-card);
-    color: var(--text-primary);
-    font-family:var(--font-body);
-    font-size:14.5px;
-    font-weight:600;
-    outline:none;
-  }
-  .field input:focus{ border-color: var(--amber); }
-  .field input:disabled{
-    opacity:0.72;
-    cursor:not-allowed;
-    background: color-mix(in srgb, var(--ink) 4%, var(--surface-card));
-    color: var(--text-secondary);
-  }
-  .field input::placeholder{ color: var(--text-secondary); font-weight:500; }
-  .auth-hint{
-    font-size:12px;
-    color: var(--text-secondary);
-    margin: -4px 0 14px;
-    line-height:1.4;
-  }
-  .auth-back{
-    margin-top:12px;
-    width:100%;
-    padding:12px;
+    height:var(--fh);
+    padding:0 12px;
     border:none;
-    background:none;
-    color: var(--text-secondary);
+    border-radius: calc(var(--fh) * .3);
+    background: var(--orange);
+    color:#111;
+    text-align:center;
     font-family:var(--font-body);
-    font-weight:700;
-    font-size:13.5px;
+    font-size: calc(var(--fh) * .5);
+    outline:none;
+    box-shadow: 0 3px 8px rgba(200,130,20,0.2);
+  }
+  .auth-fields > :nth-child(1){ animation-delay:.8s; }
+  .auth-fields > :nth-child(2){ animation-delay:.98s; }
+  .auth-fields > :nth-child(3){ animation-delay:1.16s; }
+  /* Placeholders: muted so they read as hints, not typed text */
+  .auth-field::placeholder{ color: rgba(17,17,17,0.45); opacity:1; -webkit-text-fill-color: rgba(17,17,17,0.45); }
+  .auth-field:focus{ outline:3px solid #111; outline-offset:2px; }
+  .auth-field:disabled{ opacity:1; cursor:not-allowed; -webkit-text-fill-color:#111; }
+  .auth-hint{
+    position:absolute;
+    left:0; right:0;
+    top:calc(100% + 4px);
+    margin:0;
+    text-align:center;
+    font-size: clamp(10.5px, 1.55vh, 12.5px);
+    line-height:1.3;
+    color:#111;
+    opacity:.8;
+  }
+
+  .auth-back{
+    --btn-h: clamp(42px, 6vh, 54px);
+    --ic: calc(var(--btn-h) - 10px);
+    position:absolute;
+    left:5.4%;
+    bottom: calc(var(--set-h) + 22px + env(safe-area-inset-bottom, 0px));
+    width:56%;
+    height:var(--btn-h);
+    display:flex;
+    align-items:center;
+    padding:0 12px 0 5px;
+    border:none;
+    border-radius: calc(var(--btn-h) * .3);
+    background: var(--green);
+    color:#111;
     cursor:pointer;
+    font-family:var(--font-body);
+    box-shadow: 0 3px 8px rgba(70,110,20,0.18);
+    transition: transform .18s ease, box-shadow .18s ease;
+    animation: panFromLeft .7s cubic-bezier(.2,.9,.25,1) 1.3s backwards;
+  }
+  .auth-back:hover{ transform: translateY(-4px) scale(1.03); box-shadow: 8px 12px 18px rgba(70,110,20,0.28); }
+  .auth-back:active{ transform: scale(0.97); }
+  .auth-submit{
+    position:absolute;
+    left:8px; right:8px;
+    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    height:var(--set-h);
+    border:none;
+    border-radius:16px;
+    background: var(--green);
+    color:#111;
+    font-family:var(--font-body);
+    font-size: calc(var(--set-h) * .44);
+    letter-spacing:0.04em;
+    line-height:1;
+    cursor:pointer;
+    box-shadow: 0 3px 8px rgba(70,110,20,0.18);
+    transition: transform .18s ease, box-shadow .18s ease;
+    animation: riseUp .7s cubic-bezier(.2,1.1,.3,1) 1.45s backwards;
+  }
+  .auth-submit:hover{ transform: translateY(-3px); box-shadow: 6px 10px 16px rgba(70,110,20,0.26); }
+  .auth-submit:active{ transform: scale(0.98); }
+  .auth-back:focus-visible,
+  .auth-submit:focus-visible{ outline:3px solid #111; outline-offset:3px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .auth-top, .auth-bottom, .auth-disc, .auth-tabs, .auth-slot, .auth-back, .auth-submit{ animation:none; }
   }
 
   /* ---- Schedule / truck live ---- */
@@ -1516,6 +1812,14 @@
     done = true;
     clearTimeout(t1); clearTimeout(t2);
     intro.classList.add("out");
+    // Start the Home load animations as the splash fades away
+    setTimeout(function(){
+      document.documentElement.classList.add("intro-done");
+      setTimeout(function(){
+        var h = document.getElementById("screen-home");
+        if (h) h.classList.add("settled");   // sequence is over; don't replay on return to Home
+      }, 3400);
+    }, 200);
     setTimeout(function(){ if (intro.parentNode) intro.parentNode.removeChild(intro); }, 600);
   }
   t1 = setTimeout(finish, reduce ? 1400 : 4600);
@@ -1576,11 +1880,11 @@
   <div class="send-sub" id="sendSub"></div>
   <div class="send-dots"><span></span><span></span><span></span></div>
 </div>
-<div class="shell">
+<div class="shell is-home">
 
   <header class="topbar">
     <div class="wordmark">
-      <img src="assets/trashlift-logo.png" alt="TrashLift" class="wordmark-logo">
+      <span class="wordmark-text">TrashLift</span>
       <small>For BF Homes</small>
     </div>
     <div class="brgy-pill">📍 BF Homes, Parañaque</div>
@@ -1590,44 +1894,24 @@
 
     <!-- HOME / MAIN MENU -->
     <section class="screen active" id="screen-home">
-      <div class="home-hero">
-        <div class="eyebrow">BF Homes</div>
-        <h2>What Do You Need?</h2>
-        <p>Log in to Collect or Pick up. Truck locations &amp; schedule are open to everyone — no account needed.</p>
-      </div>
+      <div class="home-yellow" aria-hidden="true"></div>
+      <svg class="home-wave" viewBox="0 0 314 260" preserveAspectRatio="none" aria-hidden="true"><path fill="#FFFFFF" d="M0 211C25 238 55 252 85 252C125 252 145 222 175 192C205 165 235 152 262 155C290 158 305 172 314 184L314 0L0 0Z"/></svg>
+      <h1 class="home-title">TrashLift</h1>
 
-      <div class="menu-list">
-        <button class="menu-card" id="roleWorkerBtn" data-auth-role="worker" style="--accent:var(--clay)">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h11A1.5 1.5 0 0 1 17 8.5V16H3V8.5z"/><path d="M17 10h2.4L22 13.2V16h-5v-6z"/><circle cx="6.5" cy="18.2" r="1.8"/><circle cx="17.5" cy="18.2" r="1.8"/><circle cx="9.5" cy="11.5" r="1.6" fill="#C5E07A"/></svg>
-          </span>
-          <span class="menu-text">
-            <span class="menu-title">Collect</span>
-            <span class="menu-sub">Barangay worker — opens Collector view after login</span>
-          </span>
-          <svg class="menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+      <div class="home-menu">
+        <button class="menu-card to-right" id="roleWorkerBtn" data-auth-role="worker">
+          <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="5.5" width="12" height="10" rx="1.6"/><path d="M15 8.5h3.6L22.5 12.6V15.5H15z"/><path class="hole" d="M16.6 10h1.4l2.1 2.4h-3.5z"/><circle cx="6" cy="17.4" r="2.4"/><circle cx="17.6" cy="17.4" r="2.4"/><circle class="hole" cx="6" cy="17.4" r=".9"/><circle class="hole" cx="17.6" cy="17.4" r=".9"/></svg></span>
+          <span class="menu-title">Collector</span>
         </button>
 
-        <button class="menu-card" id="roleResidentBtn" data-auth-role="resident" style="--accent:var(--amber-dark)">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 3h6l1 3h4v2H4V6h4l1-3zm-3 7h12l-1.1 11.2A2 2 0 0 1 14.9 23H9.1a2 2 0 0 1-2-1.8L6 10zm5 3v7h2v-7h-2z"/></svg>
-          </span>
-          <span class="menu-text">
-            <span class="menu-title">Pick Up</span>
-            <span class="menu-sub">Resident — request a pickup, then track it</span>
-          </span>
-          <svg class="menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+        <button class="menu-card to-left" id="roleResidentBtn" data-auth-role="resident">
+          <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="2.2" rx="1"/><rect x="8.8" y="2.6" width="6.4" height="2.2" rx=".9"/><path d="M5.6 8.4h12.8l-1 11.6a2 2 0 0 1-2 1.8H8.6a2 2 0 0 1-2-1.8z"/><path d="M9.6 11v8M12 11v8M14.4 11v8" stroke="#FCFFFF" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg></span>
+          <span class="menu-title">Pick up</span>
         </button>
 
-        <button class="menu-card" data-screen="screen-schedule" style="--accent:var(--teal)">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7.5 7.5 0 0 0-7.5 7.5c0 5.4 7.5 12.5 7.5 12.5s7.5-7.1 7.5-12.5A7.5 7.5 0 0 0 12 2zm0 10.2a2.7 2.7 0 1 1 0-5.4 2.7 2.7 0 0 1 0 5.4z"/></svg>
-          </span>
-          <span class="menu-text">
-            <span class="menu-title">Truck Location &amp; Schedule</span>
-            <span class="menu-sub">Live truck, ETA, and pickup days — no login</span>
-          </span>
-          <svg class="menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+        <button class="menu-card to-right" data-screen="screen-schedule">
+          <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 1.8a7.7 7.7 0 0 0-7.7 7.7c0 5.6 7.7 12.7 7.7 12.7s7.7-7.1 7.7-12.7A7.7 7.7 0 0 0 12 1.8zm0 10.6a2.9 2.9 0 1 1 0-5.8 2.9 2.9 0 0 1 0 5.8z"/></svg></span>
+          <span class="menu-title small">schedule &amp; location</span>
         </button>
       </div>
 
@@ -1635,39 +1919,49 @@
         <span class="fn-by">Made by</span>
         <span class="fn-404">404</span>
       </div>
+
+      <!-- Settings: placeholder for now, no action wired up yet -->
+      <button type="button" class="home-settings" id="homeSettingsBtn" aria-label="Settings (coming soon)">
+        <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(0 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(45 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(90 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(135 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(180 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(225 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(270 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="7.4"/><circle class="hole" cx="12" cy="12" r="3.2"/></svg></span>
+      </button>
     </section>
 
     <!-- AUTH (login / sign up) — Collect & Pick up -->
     <section class="screen" id="screen-auth">
-      <div class="screen-head">
-        <h2 class="screen-title" id="authTitle">Log in</h2>
-        <p class="screen-sub" id="authSub">Enter your name to continue. Email and password are locked for this prototype.</p>
+      <svg class="auth-top" viewBox="0 0 276 200" preserveAspectRatio="none" aria-hidden="true"><path fill="#7CC644" d="M0 172C22 184 44 191 66 190C100 189 118 176 145 163C175 149 200 146 222 149C246 152 264 160 276 167L276 0L0 0Z"/></svg>
+      <svg class="auth-bottom" viewBox="0 0 276 196" preserveAspectRatio="none" aria-hidden="true"><path fill="#FFEB5B" d="M0 26C22 38 44 44 68 44C100 44 118 32 146 22C176 10 200 2 222 3C246 4 264 12 276 18L276 196L0 196Z"/></svg>
+      <div class="auth-disc auth-disc-top" aria-hidden="true"></div>
+      <div class="auth-disc auth-disc-bottom" aria-hidden="true"></div>
+
+      <h1 class="auth-title" id="authTitle">Log in</h1>
+      <p class="auth-sr" id="authSub"></p>
+
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="active" id="authTabLogin" data-mode="login">Log in</button>
+        <button type="button" id="authTabSignup" data-mode="signup">Sign up</button>
       </div>
 
-      <div class="auth-card">
-        <div class="auth-tabs" role="tablist">
-          <button type="button" class="active" id="authTabLogin" data-mode="login">Log in</button>
-          <button type="button" id="authTabSignup" data-mode="signup">Sign up</button>
+      <form class="auth-form" id="authForm" autocomplete="off">
+        <div class="auth-fields">
+          <div class="auth-slot to-left">
+            <input class="auth-field" type="text" id="authName" name="name" placeholder="Name" aria-label="Name" required autocomplete="name">
+          </div>
+          <div class="auth-slot to-right">
+            <input class="auth-field" type="email" id="authEmail" name="email" placeholder="Email" aria-label="Email (not needed for this prototype)" disabled tabindex="-1">
+            <p class="auth-hint">Prototype: not required.</p>
+          </div>
+          <div class="auth-slot to-left">
+            <input class="auth-field" type="password" id="authPassword" name="password" placeholder="Password" aria-label="Password (not needed for this prototype)" disabled tabindex="-1">
+            <p class="auth-hint" id="authModeHint">Prototype: only your name is needed.</p>
+          </div>
         </div>
+      </form>
 
-        <form id="authForm" autocomplete="off">
-          <div class="field">
-            <label for="authName">Name <span class="req">*</span></label>
-            <input type="text" id="authName" name="name" placeholder="e.g. Juan Dela Cruz" required autocomplete="name">
-          </div>
-          <div class="field">
-            <label for="authEmail">Email</label>
-            <input type="email" id="authEmail" name="email" placeholder="(Prototype: not required)" disabled tabindex="-1">
-          </div>
-          <div class="field">
-            <label for="authPassword">Password</label>
-            <input type="password" id="authPassword" name="password" placeholder="(Prototype: not required)" disabled tabindex="-1">
-          </div>
-          <p class="auth-hint" id="authModeHint">Prototype: only your name is needed to log in.</p>
-          <button class="submit-btn" type="submit" id="authSubmitBtn">Continue</button>
-        </form>
-        <button type="button" class="auth-back" id="authBackBtn">← Back to Home</button>
-      </div>
+      <button type="button" class="auth-back" id="authBackBtn">
+        <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.5 4.5 4 12l7.5 7.5 2.2-2.2L9.4 13.4H20v-2.8H9.4l4.3-4.3z"/></svg></span>
+        <span class="menu-title small">back to home</span>
+      </button>
+      <button type="submit" form="authForm" class="auth-submit" id="authSubmitBtn">Submit</button>
     </section>
 
     <!-- REQUEST SCREEN (residents after login) -->
@@ -1691,18 +1985,24 @@
         Use my current location
       </button>
 
-      <div class="section-label">What kind of trash?</div>
-      <div class="chips" id="typeChips"></div>
-
-      <div class="section-label">Live photo of the trash</div>
+      <div class="section-label">Snap the trash — AI will identify it</div>
       <div class="camera-card" id="cameraCard">
         <p class="camera-hint" id="cameraHint">Collectors need a live camera shot — not a file from your gallery — so they can confirm there is trash to pick up.</p>
-        <img class="camera-preview" id="cameraPreview" alt="Captured trash">
-        <div class="camera-actions">
+        <div class="scan-wrap" id="scanWrap">
+          <img class="camera-preview" id="cameraPreview" alt="Captured trash">
+          <div class="scan-fx"><span class="scan-line"></span></div>
+          <div class="ai-stamp" id="aiStamp">NOT TRASH</div>
+          <div class="ai-tag" id="aiTag"><span class="dot"></span><span id="aiTagText"></span></div>
+        </div>
+        <div class="ai-result" id="aiResult" role="status" aria-live="polite"></div>
+        <div class="camera-actions" style="margin-top:10px;">
           <button type="button" class="primary" id="openCameraBtn">Open camera</button>
           <button type="button" id="retakePhotoBtn" style="display:none;">Retake</button>
         </div>
       </div>
+
+      <div class="section-label">What kind of trash? <span style="font-weight:600;opacity:.7;">(AI picks it — change it if it's wrong)</span></div>
+      <div class="chips" id="typeChips"></div>
 
       <div class="section-label">Note for the collector (optional)</div>
       <textarea class="note" id="noteInput" placeholder="e.g. Sa tapat ng sari-sari store, malapit sa kanto…"></textarea>
@@ -1852,6 +2152,24 @@
     </div>
   </div>
 
+<script>
+(function(){
+  var h = document.querySelector(".home-title");
+  if (!h || h.dataset.tw) return;
+  var txt = h.textContent.trim();
+  h.dataset.tw = "1";
+  h.setAttribute("aria-label", txt);
+  h.textContent = "";
+  txt.split("").forEach(function(ch, i){
+    var sp = document.createElement("span");
+    sp.className = "tw-ch";
+    sp.setAttribute("aria-hidden", "true");
+    sp.style.setProperty("--i", i);
+    sp.textContent = ch;
+    h.appendChild(sp);
+  });
+})();
+</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 (function(){
@@ -1889,7 +2207,7 @@
     if (!el || el.disabled) return;
     var kind = "tap";
     if (el.id === "team404" || el.classList.contains("home-footnote")) kind = "pop";
-    else if (el.classList.contains("submit-btn") || (el.classList.contains("primary") && el.tagName === "BUTTON")) kind = "ok";
+    else if (el.classList.contains("submit-btn") || el.classList.contains("auth-submit") || (el.classList.contains("primary") && el.tagName === "BUTTON")) kind = "ok";
     playTap(kind);
   }, true);
 
@@ -1946,6 +2264,7 @@
     geoWatchId: null,
     lastPostedLoc: null,
     trashPhoto: null,
+    ai: { status: "idle", result: null },   // idle | scanning | trash | not_trash | unavailable
     cameraStream: null,
     cameraMode: "pickup", // "pickup" | "chat"
     pendingRole: null,
@@ -2216,6 +2535,20 @@
   }
 
   // ---------- auth ----------
+  // Typewriter helper: splits text into per-letter spans (animated in CSS)
+  function typeInto(el, text){
+    el.setAttribute("aria-label", text);
+    el.textContent = "";
+    text.split("").forEach(function(ch, i){
+      var sp = document.createElement("span");
+      sp.className = "tw-ch";
+      sp.setAttribute("aria-hidden", "true");
+      sp.style.setProperty("--i", i);
+      sp.textContent = ch;
+      el.appendChild(sp);
+    });
+  }
+
   function openAuth(role){
     state.pendingRole = role;
     state.authMode = "login";
@@ -2224,10 +2557,10 @@
     var title = document.getElementById("authTitle");
     var sub = document.getElementById("authSub");
     if (role === "worker"){
-      title.textContent = "Collect — log in";
+      typeInto(title, "Collector");
       sub.textContent = "Barangay workers unlock Collector view after logging in. Name only for this prototype.";
     } else {
-      title.textContent = "Pick up — log in";
+      typeInto(title, "Pick up");
       sub.textContent = "Residents unlock Request after logging in, then Track after sending a request.";
     }
     goToScreen("screen-auth", true);
@@ -2237,12 +2570,11 @@
     state.authMode = mode;
     document.getElementById("authTabLogin").classList.toggle("active", mode === "login");
     document.getElementById("authTabSignup").classList.toggle("active", mode === "signup");
-    document.getElementById("authSubmitBtn").textContent =
-      mode === "signup" ? "Create account" : "Continue";
+    document.getElementById("authSubmitBtn").textContent = "Submit";
     document.getElementById("authModeHint").textContent =
       mode === "signup"
-        ? "Prototype: sign up with your name only. Email & password stay locked."
-        : "Prototype: only your name is needed to log in.";
+        ? "Prototype: sign up with your name only."
+        : "Prototype: only your name is needed.";
   }
 
   function initAuth(){
@@ -2450,8 +2782,140 @@
     });
   }
 
+  // ---------- AI trash camera ----------
+  // If the AI service can't be reached (no API key, offline, timeout), residents can still
+  // submit by picking the type themselves. Set AI_STRICT = true to block submits instead.
+  var AI_STRICT = false;
+  var AI_TIMEOUT_MS = 25000;
+  var aiScanSeq = 0;
+
+  function aiAllowsSubmit(){
+    var s = state.ai.status;
+    return s === "trash" || (s === "unavailable" && !AI_STRICT);
+  }
+
   function updateSubmitState(){
-    document.getElementById("submitBtn").disabled = !(state.pin && state.selectedType && state.trashPhoto);
+    document.getElementById("submitBtn").disabled = !(state.pin && state.selectedType && state.trashPhoto && aiAllowsSubmit());
+  }
+
+  function wasteTypeById(id){
+    return WASTE_TYPES.filter(function(t){ return t.id === id; })[0] || null;
+  }
+
+  function selectType(id){
+    state.selectedType = id;
+    var wrap = document.getElementById("typeChips");
+    Array.prototype.forEach.call(wrap.children, function(c){
+      c.classList.toggle("selected", !!id && c.dataset.id === id);
+    });
+    updateSubmitState();
+  }
+
+  function setAiPanel(kind, title, body){
+    var panel = document.getElementById("aiResult");
+    panel.className = "ai-result" + (kind ? " show " + kind : "");
+    panel.innerHTML = "";
+    if (!kind) return;
+    var t = document.createElement("div");
+    t.className = "ai-title";
+    t.textContent = title;
+    panel.appendChild(t);
+    if (body){
+      var b = document.createElement("div");
+      b.className = "ai-body";
+      b.textContent = body;   // model text goes in as text, never HTML
+      panel.appendChild(b);
+    }
+  }
+
+  function renderAi(){
+    var a = state.ai;
+    var card = document.getElementById("cameraCard");
+    document.getElementById("scanWrap").classList.toggle("scanning", a.status === "scanning");
+    document.getElementById("aiStamp").classList.toggle("show", a.status === "not_trash");
+    var tag = document.getElementById("aiTag");
+    tag.classList.remove("show");
+    if (a.status === "not_trash"){
+      document.getElementById("cameraHint").textContent = "This photo can't be sent. Retake it with the garbage in view.";
+    }
+    card.classList.toggle("ai-bad", a.status === "not_trash");
+    card.classList.toggle("ai-ok", a.status === "trash");
+
+    if (a.status === "scanning"){
+      setAiPanel("scanning", "Scanning your photo…", "AI is checking what kind of trash this is.");
+    } else if (a.status === "trash"){
+      var r = a.result, type = wasteTypeById(r.category);
+      var pct = Math.round((r.confidence || 0) * 100);
+      document.getElementById("aiTagText").textContent = type ? type.label : "Trash";
+      tag.querySelector(".dot").style.background = type ? type.color : "";
+      tag.classList.add("show");
+      setAiPanel("ok",
+        "TRASH · " + (type ? type.label : "General") + (pct ? " · " + pct + "% sure" : ""),
+        (r.label ? r.label + ". " : "") + "We picked the type for you below. Change it if it's wrong.");
+    } else if (a.status === "not_trash"){
+      var nr = a.result;
+      setAiPanel("bad", "NOT TRASH",
+        (nr.label ? "Looks like: " + nr.label + ". " : "") + (nr.reason || "") + " Retake a photo with the garbage in the frame.");
+    } else if (a.status === "unavailable"){
+      setAiPanel("warn", "AI check unavailable", a.error + " Pick the trash type yourself below.");
+    } else {
+      setAiPanel(null);
+    }
+  }
+
+  function resetAi(){
+    aiScanSeq++;
+    state.ai = { status: "idle", result: null };
+    renderAi();
+  }
+
+  function runAiScan(dataUrl){
+    var seq = ++aiScanSeq;
+    state.ai = { status: "scanning", result: null };
+    selectType(null);
+    renderAi();
+    updateSubmitState();
+
+    var ctrl = ("AbortController" in window) ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, AI_TIMEOUT_MS) : null;
+
+    fetch(apiUrl("/api/classify"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dataUrl: dataUrl }),
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function(r){
+      return r.json().catch(function(){ return {}; }).then(function(j){
+        if (!r.ok){
+          var e = new Error(j.error || ("HTTP " + r.status));
+          e.code = j.code || null;
+          throw e;
+        }
+        return j;
+      });
+    }).then(function(res){
+      if (seq !== aiScanSeq) return;   // photo was retaken while scanning
+      if (res.verdict === "trash"){
+        state.ai = { status: "trash", result: res };
+        renderAi();
+        selectType(res.category);
+      } else {
+        state.ai = { status: "not_trash", result: res };
+        renderAi();
+        updateSubmitState();
+      }
+    }).catch(function(err){
+      if (seq !== aiScanSeq) return;
+      var msg = err && err.code === "no_key" ? "The AI camera isn't set up on the server yet."
+              : err && err.code === "rate" ? "Too many scans. Wait a moment."
+              : err && err.name === "AbortError" ? "The AI took too long to answer."
+              : "Couldn't reach the AI.";
+      state.ai = { status: "unavailable", result: null, error: msg };
+      renderAi();
+      updateSubmitState();
+    }).then(function(){
+      if (timer) clearTimeout(timer);
+    });
   }
 
   function stopCameraStream(){
@@ -2487,7 +2951,7 @@
     document.getElementById("cameraHint").textContent = "Live photo attached. Collectors will see this before they accept.";
     document.getElementById("retakePhotoBtn").style.display = "";
     document.getElementById("openCameraBtn").textContent = "Retake live photo";
-    updateSubmitState();
+    runAiScan(dataUrl);
   }
 
   function openLiveCamera(){
@@ -2744,7 +3208,16 @@
         showStatus("Take a live camera photo of the trash first.", true);
         return;
       }
+      if (state.ai.status === "scanning"){
+        showStatus("Hold on, AI is still checking your photo.", true);
+        return;
+      }
+      if (state.ai.status === "not_trash"){
+        showStatus("NOT TRASH. Retake a photo of the actual garbage.", true);
+        return;
+      }
       var typeObj = WASTE_TYPES.filter(function(t){ return t.id === state.selectedType; })[0];
+      var aiRes = state.ai.status === "trash" ? state.ai.result : null;
       var reqId = "r" + Date.now();
       var req = {
         id: reqId,
@@ -2759,7 +3232,11 @@
         createdAt: Date.now(),
         brgy: BRGY_NAME,
         residentName: state.user && state.user.name ? state.user.name : null,
-        photoUrl: null
+        photoUrl: null,
+        aiChecked: !!aiRes,
+        aiCategory: aiRes ? aiRes.category : null,
+        aiLabel: aiRes ? aiRes.label : null,
+        aiConfidence: aiRes ? aiRes.confidence : null
       };
 
       showStatus("", false);
@@ -2784,6 +3261,7 @@
         document.getElementById("cameraHint").textContent = "Collectors need a live camera shot — not a file from your gallery — so they can confirm there is trash to pick up.";
         document.getElementById("retakePhotoBtn").style.display = "none";
         document.getElementById("openCameraBtn").textContent = "Open camera";
+        resetAi();
         updateSubmitState();
       }).catch(function(){
         sendOverlay.hide();
@@ -3390,6 +3868,11 @@
     document.querySelectorAll(".screen").forEach(function(s){
       s.classList.toggle("active", s.id === screenId);
     });
+    var shellEl = document.querySelector(".shell");
+    if (shellEl){
+      shellEl.classList.toggle("is-home", screenId === "screen-home");
+      shellEl.classList.toggle("is-auth", screenId === "screen-auth");
+    }
 
     if (screenId === "screen-track") renderTrackList();
     if (screenId === "screen-collector") renderCollectorList();
@@ -3448,7 +3931,7 @@
       var palettes404 = [
         { a:"#1A1A16", b:"#3E8E6A", c:"#1B7A3A", glow:"#C5E07A" },
         { a:"#C97F1E", b:"#E9A23B", c:"#C1542F", glow:"#F3D38A" },
-        { a:"#16342B", b:"#2F6F63", c:"#C5E07A", glow:"#8FCFB8" },
+        { a:"#16342B", b:"#2F6F63", c:"#1B7A3A", glow:"#8FCFB8" },
         { a:"#6B2D5B", b:"#C1542F", c:"#E9A23B", glow:"#F0B7A0" },
         { a:"#1B3E32", b:"#245650", c:"#4A90A4", glow:"#A8D4E0" },
         { a:"#2C1810", b:"#C1542F", c:"#E07A5F", glow:"#F2C4B0" }
