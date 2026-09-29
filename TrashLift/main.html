@@ -299,6 +299,14 @@
     overflow:hidden;
     background:#5FB6E8;
   }
+  .home-hero{
+    animation: heroDrop .8s cubic-bezier(.2,.9,.25,1) backwards;
+    animation-play-state: var(--play);
+  }
+  @keyframes heroDrop{
+    from{ transform: translateY(-105%); }
+    to{   transform: none; }
+  }
   .home-heroBg{
     position:absolute;
     left:0; top:0;
@@ -328,6 +336,14 @@
     overflow:hidden;
     pointer-events:none;
     z-index:0;
+  }
+  .home-bushes{
+    animation: bushRise .8s cubic-bezier(.2,.9,.25,1) .25s backwards;
+    animation-play-state: var(--play);
+  }
+  @keyframes bushRise{
+    from{ transform: translateY(105%); }
+    to{   transform: none; }
   }
   .home-bushes img{
     width:100%;
@@ -592,6 +608,8 @@
   }
   /* After the load sequence has played, drop it so returning to Home doesn't replay it */
   #screen-home.settled .home-yellow,
+  #screen-home.settled .home-hero,
+  #screen-home.settled .home-bushes,
   #screen-home.settled .tw-ch,
   #screen-home.settled .tw-ch::after,
   #screen-home.settled .menu-card,
@@ -600,7 +618,7 @@
   #screen-home.settled .tw-ch{ opacity:1; }
 
   @media (prefers-reduced-motion: reduce){
-    .wordmark, .wordmark-text, .wordmark small, .home-yellow, .menu-card, .home-settings, .home-footnote, .home-footnote .fn-404, .home-decor, header.topbar::before,
+    .wordmark, .wordmark-text, .wordmark small, .home-yellow, .home-hero, .home-bushes, .menu-card, .home-settings, .home-footnote, .home-footnote .fn-404, .home-decor, header.topbar::before,
     .tw-ch, .tw-ch::after{
       animation:none;
     }
@@ -2192,6 +2210,178 @@
   #screen-collector a.co-maps:active{ opacity:1; transform:scale(.99); }
 
   .co-empty .co-cream{ padding:calc(60*var(--u)) calc(40*var(--u)); text-align:center; font-family:var(--font-display); font-size:calc(30*var(--u)); line-height:1.35; color:#7CC644; text-transform:uppercase; }
+
+/* ==== Photo + bottom-space fixes ==== */
+/* Photos: show the whole picture (no cropping) and give them more room */
+.co-win{ height:calc(440*var(--u)); background:#1B1B16; }
+.co-photo{ object-fit:contain; background:#1B1B16; }
+.tk-win-in{ height:calc(380*var(--u)); background:#1B1B16; }
+.tk-win.has-map .tk-win-in{ height:calc(400*var(--u)); }
+.tk-photo{ object-fit:contain; background:#1B1B16; }
+.tk-thumb{ width:calc(170*var(--u)); height:calc(128*var(--u)); object-fit:contain; background:#1B1B16; }
+.chat-bubble-photo{ width:240px; }
+.req-photo{ max-height:300px; object-fit:contain; }
+
+/* Track + Collector pages: stage fills the screen, art pinned to the bottom, leaves fill the gap */
+#screen-collector.active, #screen-track.active{ display:flex; flex-direction:column; min-height:100%; }
+#screen-collector .tk-stage, #screen-track .tk-stage{ flex:1 0 auto; display:flex; flex-direction:column; }
+#screen-collector .tk-stage > *, #screen-track .tk-stage > *{ flex:none; }
+#screen-collector .tk-stage > .tk-leaves, #screen-track .tk-stage > .tk-leaves{ flex:1 1 auto; }
+.tk-stage .tk-leaves{
+  position:relative; z-index:0; min-height:calc(230*var(--u)); margin-top:calc(20*var(--u)); margin-bottom:calc(-44*var(--u)); overflow:hidden; pointer-events:none;
+}
+.tk-stage .tk-leaves::before, .tk-stage .tk-leaves::after{
+  content:""; position:absolute; bottom:0; height:100%; max-height:calc(300*var(--u)); aspect-ratio:5 / 6; background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'><g transform='translate(18 236)'><path transform='rotate(-88)' d='M0 0C22-30 70-30 118 0C70 30 22 30 0 0Z' fill='%23009900'/><path transform='rotate(-68)' d='M0 0C22-30 70-30 150 0C70 30 22 30 0 0Z' fill='%237CC644'/><path transform='rotate(-48)' d='M0 0C24-32 78-32 178 0C78 32 24 32 0 0Z' fill='%233E8E1F'/><path transform='rotate(-30)' d='M0 0C24-32 78-32 165 0C78 32 24 32 0 0Z' fill='%23A8DB55'/><path transform='rotate(-12)' d='M0 0C22-28 66-28 130 0C66 28 22 28 0 0Z' fill='%237CC644'/><path transform='rotate(-58)' d='M8 0L140 0' stroke='%23FFEB5B' stroke-width='3' stroke-linecap='round' opacity='.7'/></g></svg>") no-repeat left bottom / contain;
+}
+.tk-stage .tk-leaves::before{ left:calc(-10*var(--u)); }
+.tk-stage .tk-leaves::after{ right:calc(-10*var(--u)); transform:scaleX(-1); }
+#screen-collector .tk-stage .tk-scene, #screen-track .tk-stage .tk-scene{ margin-top:0; }
+/* Collector view: skyline BEHIND the cards (pinned to page bottom), bushes IN FRONT of the last card (matches TRUCK mock) */
+#screen-collector .tk-stage{ position:relative; isolation:isolate; }
+#screen-collector .co-city, #screen-collector .co-bushes{
+  position:absolute; left:0; bottom:0; width:100%; height:auto; aspect-ratio:832 / 633;
+  display:block; pointer-events:none; user-select:none;
+}
+#screen-collector .co-city{ z-index:0; }
+#screen-collector .co-head{ z-index:1; background:#fff; }
+#screen-collector .co-list{ z-index:2; margin-bottom:calc(100cqw * 0.274); } /* last card overlaps the scene, like the mock */
+#screen-collector .co-bushes{ z-index:3; }
+
+
+/* Request page: leaves in the empty white space around the skyline */
+.rq-leaf{ position:absolute; z-index:1; top:78.2%; width:17cqw; aspect-ratio:5 / 6; background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 240'><g transform='translate(18 236)'><path transform='rotate(-88)' d='M0 0C22-30 70-30 118 0C70 30 22 30 0 0Z' fill='%23009900'/><path transform='rotate(-68)' d='M0 0C22-30 70-30 150 0C70 30 22 30 0 0Z' fill='%237CC644'/><path transform='rotate(-48)' d='M0 0C24-32 78-32 178 0C78 32 24 32 0 0Z' fill='%233E8E1F'/><path transform='rotate(-30)' d='M0 0C24-32 78-32 165 0C78 32 24 32 0 0Z' fill='%23A8DB55'/><path transform='rotate(-12)' d='M0 0C22-28 66-28 130 0C66 28 22 28 0 0Z' fill='%237CC644'/><path transform='rotate(-58)' d='M8 0L140 0' stroke='%23FFEB5B' stroke-width='3' stroke-linecap='round' opacity='.7'/></g></svg>") no-repeat left bottom / contain; pointer-events:none; }
+.rq-leaf.l{ left:-1.5cqw; }
+.rq-leaf.r{ right:-1.5cqw; transform:scaleX(-1); }
+.rq-leaf.l2{ left:-1.5cqw; top:52%; width:12cqw; opacity:.95; }
+.rq-leaf.r2{ right:-1.5cqw; top:34%; width:12cqw; transform:scaleX(-1); opacity:.95; }
+
+/* ==== Account / Settings card (matches official design) ==== */
+.account-sheet{
+  left:14px; right:14px; bottom:calc(14px + env(safe-area-inset-bottom));
+  padding:14px; background:#7CC644; border:none; border-radius:34px;
+  box-shadow:0 16px 34px rgba(0,80,0,.28);
+  transform:translateY(130%);
+}
+.account-sheet.open{ transform:translateY(0); }
+.account-sheet .account-handle{ display:none; }
+.account-sheet .account-inner{ background:#FBFDFD; border-radius:24px; padding:16px 16px 18px; }
+.account-sheet .account-head{ margin:0 0 14px; gap:16px; align-items:center; }
+.account-sheet .account-avatar{ width:52px; height:52px; background:#009900; color:#fff; }
+.account-sheet .account-avatar svg{ width:100%; height:100%; }
+.account-sheet .account-email, .account-sheet .account-role{ display:none; }
+.account-sheet .account-name{
+  font-family:var(--font-display); font-weight:400; font-size:24px; line-height:1; text-transform:uppercase;
+  color:#009900; paint-order:stroke fill; -webkit-text-stroke:2.5px #FFEB5B; letter-spacing:.01em;
+}
+.account-sheet .account-actions{ gap:14px; }
+.account-sheet .account-actions button{
+  box-sizing:border-box; height:52px; padding:0 22px; border:none; border-radius:999px;
+  background:#7CC644; color:#009900; text-align:left;
+  font-family:var(--font-display); font-weight:400; font-size:19px; line-height:1; text-transform:uppercase;
+  paint-order:stroke fill; -webkit-text-stroke:2.5px #FFEB5B;
+  box-shadow:5px 8px 10px rgba(0,0,0,.22);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.account-sheet .account-actions button:active{ transform:scale(.98); box-shadow:2px 3px 5px rgba(0,0,0,.2); }
+.account-sheet .account-actions button.danger{ color:#009900; border:none; }
+/* ==== Truck & schedule — built on the Truck(16) mock (stage = 865 mock px wide) ==== */
+.shell.is-schedule{ background-color:#FFFFFF; background-image:none; animation:none; }
+.shell.is-schedule header.topbar,
+.shell.is-schedule nav.tabbar{ display:none; }
+.shell.is-schedule main{ padding:0; }
+#screen-schedule{ background:#FFFFFF; }
+#screen-schedule.active{ display:flex; flex-direction:column; min-height:100%; }
+.sc-stage{ --u:calc(100cqw / 865); flex:1 0 auto; display:flex; flex-direction:column; position:relative; isolation:isolate; container-type:inline-size; }
+.sc-stage > *{ flex:none; }
+.sc-head{ position:relative; z-index:1; width:100%; aspect-ratio:865 / 380; background:#fff; }
+.sc-head > img{ position:absolute; inset:0; width:100%; height:100%; display:block; pointer-events:none; user-select:none; }
+.sc-home{
+  position:absolute; z-index:3; left:calc(36*var(--u)); top:calc(10*var(--u)); width:calc(158*var(--u)); height:calc(112*var(--u)); margin:0; padding:0; border:none;
+  border-radius:999px; background:transparent; color:transparent; font-size:0; cursor:pointer; transition:background .12s ease, transform .18s ease;
+}
+/* Visible yellow "HOME" arrow (same look as the other pages' header arrow) */
+.sc-home{
+  background:#FFEB5B; color:#7CC644; font-size:calc(40*var(--u)); line-height:1; font-family:var(--font-display); font-weight:400; text-transform:uppercase;
+  border-radius:0; clip-path:polygon(0 50%, 40% 0, 40% 24%, 100% 24%, 100% 76%, 40% 76%, 40% 100%);
+  display:flex; align-items:center; justify-content:center; padding:0 calc(6*var(--u)) 0 calc(58*var(--u));
+}
+.sc-home:hover{ background:#FFE234; transform:translateX(-3px); }
+.sc-home:focus-visible{ outline:3px solid #111; outline-offset:3px; }
+.sc-card{
+  position:relative; z-index:0; box-sizing:border-box; background:#FFEB5B; border-radius:calc(52*var(--u)); padding:calc(15*var(--u));
+  box-shadow:0 calc(18*var(--u)) calc(30*var(--u)) rgba(200,110,0,.2);
+}
+.sc-card::before, .sc-card::after{ content:""; position:absolute; z-index:-1; width:calc(96*var(--u)); height:calc(120*var(--u)); background-repeat:no-repeat; background-size:100% 100%; pointer-events:none; }
+.sc-card::before{ left:calc(-30*var(--u)); top:calc(-44*var(--u)); background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 150'><path d='M66 74C42 50 44 18 70 2C92 24 90 54 66 74Z' fill='%235AB334'/><path d='M70 20C68 40 68 56 66 70' stroke='%233F8F22' stroke-width='2' fill='none'/><path d='M62 104C30 114 6 98 0 76C30 68 54 78 62 104Z' fill='%234FA82C'/><path d='M56 96C40 92 20 86 6 78' stroke='%233F8F22' stroke-width='2' fill='none'/></svg>"); }
+.sc-card::after{ right:calc(-34*var(--u)); top:calc(-44*var(--u)); background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 150'><path d='M44 74C68 50 66 18 40 2C18 24 20 54 44 74Z' fill='%235AB334'/><path d='M40 20C42 40 42 56 44 70' stroke='%233F8F22' stroke-width='2' fill='none'/><path d='M48 104C80 114 104 98 110 76C80 68 56 78 48 104Z' fill='%234FA82C'/><path d='M54 96C70 92 90 86 104 78' stroke='%233F8F22' stroke-width='2' fill='none'/></svg>"); }
+.sc-in{ box-sizing:border-box; border-radius:calc(40*var(--u)); background:linear-gradient(90deg,#FFDD57 0%,#FFB752 55%,#FF9048 100%); }
+.sc-card h2, .sc-card h3{
+  margin:0; text-align:center; font-family:var(--font-display); font-weight:400; font-size:calc(50*var(--u)); line-height:1.2; text-transform:uppercase;
+  color:#7CC644; paint-order:stroke fill; -webkit-text-stroke:calc(7*var(--u)) #fff;
+}
+.sc-title{ position:absolute; z-index:2; left:calc(82*var(--u)); top:calc(165*var(--u)); width:calc(568*var(--u)); height:calc(202*var(--u)); }
+.sc-title .sc-in{ height:100%; display:flex; align-items:center; justify-content:center; }
+.sc-title::before{ left:calc(-30*var(--u)); top:calc(-22*var(--u)); z-index:1; }
+.sc-title::after{ right:calc(-70*var(--u)); top:calc(-30*var(--u)); z-index:1; }
+
+.sc-list{ position:relative; z-index:2; margin-top:calc(67*var(--u)); margin-bottom:calc(100cqw * 0.30); }
+.sc-mapcard{ margin-left:calc(231*var(--u)); width:calc(567*var(--u)); height:calc(335*var(--u)); background:linear-gradient(90deg,#FFDD57 0%,#FFB752 55%,#FF9048 100%); padding:calc(14*var(--u)); }
+.sc-map{ position:relative; height:100%; border-radius:calc(40*var(--u)); overflow:hidden; background:#fff; }
+.sc-map #truckMap{ position:absolute; inset:0; width:100%; height:100%; background:#EAF3DA; }
+.sc-live{
+  position:absolute; z-index:500; top:calc(12*var(--u)); left:calc(12*var(--u)); padding:calc(6*var(--u)) calc(16*var(--u)); border-radius:999px;
+  background:rgba(0,90,0,.84); color:#fff; font-size:calc(20*var(--u)); font-weight:700; line-height:1.2; pointer-events:none;
+}
+.sc-badge{
+  position:absolute; z-index:500; left:calc(12*var(--u)); right:calc(12*var(--u)); bottom:calc(12*var(--u)); display:flex; flex-direction:column; gap:calc(2*var(--u));
+  padding:calc(8*var(--u)) calc(18*var(--u)); border-radius:calc(24*var(--u)); background:rgba(0,90,0,.86); color:#fff; font-size:calc(19*var(--u)); line-height:1.25; pointer-events:none;
+}
+.sc-badge b{ font-size:calc(22*var(--u)); }
+.sc-badge span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; opacity:.92; }
+
+.sc-eta{ margin:calc(62*var(--u)) 0 0 calc(40*var(--u)); width:calc(568*var(--u)); }
+.sc-eta .sc-in{ padding:calc(30*var(--u)) calc(24*var(--u)) calc(34*var(--u)); display:flex; flex-direction:column; align-items:center; gap:calc(16*var(--u)); min-height:calc(259*var(--u)); }
+.sc-eta-big{
+  font-family:var(--font-display); font-size:calc(78*var(--u)); line-height:1; color:#fff; text-transform:uppercase; white-space:nowrap;
+  paint-order:stroke fill; -webkit-text-stroke:calc(10*var(--u)) #009900;
+}
+.sc-eta-meta{
+  box-sizing:border-box; width:100%; padding:calc(12*var(--u)) calc(20*var(--u)); border-radius:calc(34*var(--u)); background:#FFEDC9; color:#009900; text-align:center;
+  font-size:calc(23*var(--u)); font-weight:800; line-height:1.3;
+}
+.sc-reg{ margin:calc(56*var(--u)) 0 0 calc(229*var(--u)); width:calc(567*var(--u)); }
+.sc-reg .sc-in{ padding:calc(34*var(--u)) calc(26*var(--u)) calc(34*var(--u)); display:flex; flex-direction:column; align-items:center; gap:calc(12*var(--u)); min-height:calc(379*var(--u)); }
+.sc-sub{ margin:0 0 calc(4*var(--u)); text-align:center; color:#fff; font-size:calc(21*var(--u)); font-weight:800; line-height:1.25; text-shadow:0 calc(2*var(--u)) 0 rgba(160,70,0,.55); }
+.sc-rows{ box-sizing:border-box; width:100%; display:flex; flex-direction:column; gap:calc(10*var(--u)); }
+.sc-row{ display:flex; flex-direction:column; align-items:center; gap:calc(2*var(--u)); padding:calc(10*var(--u)) calc(14*var(--u)); border-radius:calc(30*var(--u)); background:#FFEDC9; text-align:center; }
+.sc-row b{ font-family:var(--font-display); font-weight:400; font-size:calc(27*var(--u)); line-height:1.1; text-transform:uppercase; color:#7CC644; paint-order:stroke fill; -webkit-text-stroke:calc(4*var(--u)) #fff; }
+.sc-row span{ font-size:calc(22*var(--u)); font-weight:800; color:#009900; line-height:1.2; }
+.sc-row.off span{ color:#C1542F; }
+
+/* Buildings pinned to the very bottom of the page (behind the cards), bushes in front of the
+   last card — same technique as the Collector view, so the schedule page reads as one
+   continuous scene: clouds drifting down from the header all the way to the skyline at the
+   bottom, exactly like the pick-up page. */
+#screen-schedule .co-city, #screen-schedule .co-bushes{
+  position:absolute; left:0; bottom:0; width:100%; height:auto; aspect-ratio:832 / 633;
+  display:block; pointer-events:none; user-select:none;
+}
+#screen-schedule .co-city{ z-index:0; }
+#screen-schedule .co-bushes{ z-index:3; }
+
+.sc-cloud{ position:absolute; z-index:1; height:auto; mix-blend-mode:multiply; pointer-events:none; opacity:.85; }
+.sc-cloud.c1{ left:calc(-40*var(--u)); top:calc(360*var(--u)); width:calc(430*var(--u)); }
+.sc-cloud.c2{ right:calc(-60*var(--u)); top:calc(560*var(--u)); width:calc(360*var(--u)); opacity:.7; }
+.sc-cloud.c3{ left:calc(160*var(--u)); top:calc(770*var(--u)); width:calc(560*var(--u)); }
+.sc-cloud.c4{ right:calc(-30*var(--u)); top:calc(980*var(--u)); width:calc(300*var(--u)); opacity:.7; transform:scaleX(-1); }
+.sc-head .sc-cloud{ z-index:0; }
+.sc-cloud.h1{ left:calc(-70*var(--u)); top:calc(-150*var(--u)); width:calc(430*var(--u)); }
+.sc-cloud.h2{ right:calc(-90*var(--u)); top:calc(-120*var(--u)); width:calc(400*var(--u)); opacity:.8; }
+.sc-cloud.h3{ right:calc(20*var(--u)); top:calc(20*var(--u)); width:calc(300*var(--u)); opacity:.7; transform:scaleX(-1); }
+.sc-sp{ position:absolute; z-index:3; width:calc(74*var(--u)); pointer-events:none; }
+.sc-sp svg{ display:block; width:100%; height:auto; filter:drop-shadow(0 0 calc(3*var(--u)) #F2C200); }
+.sc-sp.a{ left:calc(645*var(--u)); top:calc(770*var(--u)); }
+.sc-sp.b{ left:calc(730*var(--u)); top:calc(815*var(--u)); width:calc(56*var(--u)); }
 </style>
 </head>
 <body>
@@ -2214,6 +2404,7 @@
   </div>
   <div class="intro-skip">Tap to skip</div>
 </div>
+<audio id="introSfx" src="assets/intro.mp3" preload="auto"></audio>
 <script>
 (function(){
   var intro = document.getElementById("intro");
@@ -2227,10 +2418,30 @@
   });
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var done = false, t1, t2;
+  // Intro sound: starts ~0.9s in so its hits land on the truck drop, the dot, and the TRASHLIFT letters.
+  // Browsers may block autoplay until the person interacts; if so the intro just plays silently.
+  var sfx = document.getElementById("introSfx");
+  var sfxTimer = null;
+  if (sfx && !reduce){
+    sfx.volume = 0.8;
+    sfxTimer = setTimeout(function(){
+      var p = sfx.play();
+      if (p && p.catch) p.catch(function(){});
+    }, 900);
+  }
+  function fadeSfx(){
+    clearTimeout(sfxTimer);
+    if (!sfx || sfx.paused) return;
+    var f = setInterval(function(){
+      if (sfx.volume > 0.12){ sfx.volume = Math.max(0, sfx.volume - 0.12); }
+      else { clearInterval(f); sfx.pause(); }
+    }, 30);
+  }
   function finish(){
     if (done) return;
     done = true;
     clearTimeout(t1); clearTimeout(t2);
+    fadeSfx();
     intro.classList.add("out");
     // Start the Home load animations as the splash fades away
     setTimeout(function(){
@@ -2396,7 +2607,7 @@
     <!-- REQUEST SCREEN (residents after login) — built on the Truck(8)+Truck(7) mocks -->
     <section class="screen" id="screen-request">
       <div class="rq-stage">
-        <img class="rq-bg" src="assets/request_bg.png" alt="" aria-hidden="true" draggable="false">
+        <img class="rq-bg" src="assets/request_bg.png" alt="" aria-hidden="true" draggable="false"><span class="rq-leaf l"></span><span class="rq-leaf r"></span>
 
         <button type="button" class="rq-tap rq-home" id="rqHomeBtn" aria-label="Home"></button>
 
@@ -2445,63 +2656,71 @@
           <button type="button" class="tk-tap" id="clearAllBtn" aria-label="Clear all requests">Clear all</button>
         </div>
         <div class="tk-list" id="trackList"></div>
+        <div class="tk-leaves" aria-hidden="true"></div>
         <img class="tk-scene" src="assets/tk_scene.png" alt="" aria-hidden="true" draggable="false">
       </div>
     </section>
 
-    <!-- TRUCK LOCATIONS & SCHEDULE (public) -->
+    <!-- TRUCK LOCATIONS & SCHEDULE (public) — built on the Truck(16) mock -->
     <section class="screen" id="screen-schedule">
-      <div class="screen-head">
-        <div class="screen-head-row sched-head-row">
-          <button type="button" class="sched-back" id="scheduleBackBtn" aria-label="Back to home" hidden>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
-          </button>
-          <div>
-            <h2 class="screen-title">Truck &amp; schedule</h2>
-            <p class="screen-sub">See the live truck, estimated arrival on your street, and regular pickup days — no request needed.</p>
+      <div class="tk-stage sc-stage">
+        <img class="co-city" src="assets/co_city.png" alt="" aria-hidden="true" draggable="false">
+        <div class="sc-head">
+          <img class="sc-cloud h1" src="assets/sc_cloud.png" alt="" aria-hidden="true" draggable="false">
+          <img class="sc-cloud h2" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
+          <img class="sc-cloud h3" src="assets/sc_cloud3.png" alt="" aria-hidden="true" draggable="false">
+          <button type="button" class="sc-home" id="scheduleBackBtn" aria-label="Home">Home</button>
+          <div class="sc-card sc-title"><div class="sc-in"><h2>Truck and<br>Schedule</h2></div></div>
+        </div>
+        <div class="sc-list">
+          <div class="sc-card sc-mapcard">
+            <div class="sc-map">
+              <div id="truckMap"></div>
+              <div class="sc-live"><span class="live-dot"></span>Live truck location</div>
+              <div class="sc-badge" id="truckBadge"><b>Truck en route</b><span id="truckDetail">Updating…</span></div>
+            </div>
+          </div>
+          <div class="sc-card sc-eta">
+            <div class="sc-in">
+              <h3>Estimate<br>Time</h3>
+              <div class="sc-eta-big" id="truckEta">~18 min</div>
+              <div class="sc-eta-meta" id="truckEtaMeta">Near Aguirre Ave.<br>Moving toward President’s Ave.</div>
+            </div>
+          </div>
+          <div class="sc-card sc-reg">
+            <div class="sc-in">
+              <h3>Regular<br>Schedule</h3>
+              <p class="sc-sub">Scheduled collection days for Brgy. BF Homes</p>
+              <div class="sc-rows">
+                <div class="sc-row"><b>Mon · Wed · Fri</b><span>6:00 AM – 11:00 AM</span></div>
+                <div class="sc-row"><b>Tue · Thu</b><span>1:00 PM – 5:00 PM</span></div>
+                <div class="sc-row"><b>Saturday</b><span>7:00 AM – 12:00 NN</span></div>
+                <div class="sc-row off"><b>Sunday</b><span>No regular pickup</span></div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="map-wrap">
-        <span class="map-hint"><span class="live-dot"></span>Live truck location</span>
-        <div id="truckMap"></div>
-        <div class="coord-badge" id="truckBadge">
-          <span>Truck en route</span>
-          <span class="muted" id="truckDetail">Updating…</span>
-        </div>
-      </div>
-
-      <div class="info-card">
-        <h3>Estimated arrival on your street</h3>
-        <p>Based on the truck’s current route through BF Homes (prototype demo).</p>
-        <div class="eta-row">
-          <div class="eta-big" id="truckEta">~18 min</div>
-          <div class="eta-meta" id="truckEtaMeta">Near Aguirre Ave.<br>Moving toward President’s Ave.</div>
-        </div>
-      </div>
-
-      <div class="info-card">
-        <h3>Regular pickup schedule</h3>
-        <p>Scheduled collection days for Brgy. BF Homes.</p>
-        <div class="sched-list">
-          <div class="sched-row"><span>Mon · Wed · Fri</span><span>6:00 AM – 11:00 AM</span></div>
-          <div class="sched-row"><span>Tue · Thu</span><span>1:00 PM – 5:00 PM</span></div>
-          <div class="sched-row"><span>Saturday</span><span>7:00 AM – 12:00 NN</span></div>
-          <div class="sched-row"><span>Sunday</span><span>No regular pickup</span></div>
-        </div>
+        <img class="sc-cloud c1" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
+        <img class="sc-cloud c2" src="assets/sc_cloud3.png" alt="" aria-hidden="true" draggable="false">
+        <img class="sc-cloud c3" src="assets/sc_cloud.png" alt="" aria-hidden="true" draggable="false">
+        <img class="sc-cloud c4" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
+        <i class="sc-sp a"><svg viewBox='0 0 26 26'><path d='M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z' fill='#FFE84A'/></svg></i><i class="sc-sp b"><svg viewBox='0 0 26 26'><path d='M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z' fill='#FFE84A'/></svg></i>
+        <img class="co-bushes" src="assets/co_bushes.png" alt="" aria-hidden="true" draggable="false">
       </div>
     </section>
 
     <!-- COLLECTOR SCREEN (workers after login) — built on the Truck(11) mock -->
     <section class="screen" id="screen-collector">
       <div class="tk-stage co-stage">
+        <!-- back layer: skyline sits BEHIND the cards, pinned to the bottom of the page -->
+        <img class="co-city" src="assets/co_city.png" alt="" aria-hidden="true" draggable="false">
         <div class="co-head">
           <img src="assets/co_head.png" alt="Collectors view" draggable="false">
           <button type="button" class="co-home" id="coHomeBtn" aria-label="Home — account and log out"></button>
         </div>
         <div class="co-list" id="collectorList"></div>
-        <img class="tk-scene" src="assets/tk_scene.png" alt="" aria-hidden="true" draggable="false">
+        <!-- front layer: flowering bushes overlap the lower corners of the last card -->
+        <img class="co-bushes" src="assets/co_bushes.png" alt="" aria-hidden="true" draggable="false">
       </div>
     </section>
 
@@ -2532,9 +2751,10 @@
   <div class="account-backdrop" id="accountBackdrop"></div>
   <div class="account-sheet" id="accountSheet" aria-hidden="true">
     <div class="account-handle"></div>
+    <div class="account-inner">
     <div class="account-head">
       <div class="account-avatar" id="accountAvatar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="34" r="15" fill="#fff"/><path d="M22 80Q22 56 50 56Q78 56 78 80Q78 87 71 87H29Q22 87 22 80Z" fill="#fff"/></svg>
       </div>
       <div>
         <p class="account-name" id="accountName">Guest</p>
@@ -2545,6 +2765,7 @@
     <div class="account-actions">
       <button type="button" id="accountSettingsBtn">Settings (coming soon)</button>
       <button type="button" class="danger" id="accountLogoutBtn">Log out</button>
+    </div>
     </div>
   </div>
 
@@ -4351,6 +4572,7 @@
       shellEl.classList.toggle("is-request", screenId === "screen-request");
       shellEl.classList.toggle("is-track", screenId === "screen-track");
       shellEl.classList.toggle("is-collector", screenId === "screen-collector");
+      shellEl.classList.toggle("is-schedule", screenId === "screen-schedule");
     }
 
     if (screenId === "screen-track") renderTrackList();
@@ -4360,8 +4582,6 @@
       initTruckMap();
       startTruckSim();
       setTimeout(function(){ if (state.truckMap) state.truckMap.invalidateSize(); }, 50);
-      var schedBackBtn = document.getElementById("scheduleBackBtn");
-      if (schedBackBtn) schedBackBtn.hidden = !!state.user;
     } else {
       stopTruckSim();
     }
@@ -4373,7 +4593,7 @@
   function initTabs(){
     var schedBackBtn = document.getElementById("scheduleBackBtn");
     if (schedBackBtn){
-      schedBackBtn.addEventListener("click", function(){ goToScreen("screen-home"); });
+      schedBackBtn.addEventListener("click", function(){ goToScreen(roleHomeScreen()); });
     }
     document.querySelectorAll(".tab-btn").forEach(function(btn){
       btn.addEventListener("click", function(){ goToScreen(btn.dataset.screen); });
