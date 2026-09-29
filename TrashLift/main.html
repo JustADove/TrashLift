@@ -2289,8 +2289,8 @@
 .shell.is-schedule header.topbar,
 .shell.is-schedule nav.tabbar{ display:none; }
 .shell.is-schedule main{ padding:0; }
-#screen-schedule{ background:#FFFFFF; }
-#screen-schedule.active{ display:flex; flex-direction:column; min-height:100%; }
+#screen-schedule, #screen-co2{ background:#FFFFFF; }
+#screen-schedule.active, #screen-co2.active{ display:flex; flex-direction:column; min-height:100%; }
 .sc-stage{ --u:calc(100cqw / 865); flex:1 0 auto; display:flex; flex-direction:column; position:relative; isolation:isolate; container-type:inline-size; }
 .sc-stage > *{ flex:none; }
 .sc-head{ position:relative; z-index:1; width:100%; aspect-ratio:865 / 380; background:#fff; }
@@ -2362,12 +2362,12 @@
    last card — same technique as the Collector view, so the schedule page reads as one
    continuous scene: clouds drifting down from the header all the way to the skyline at the
    bottom, exactly like the pick-up page. */
-#screen-schedule .co-city, #screen-schedule .co-bushes{
+#screen-schedule .co-city, #screen-schedule .co-bushes, #screen-co2 .co-city, #screen-co2 .co-bushes{
   position:absolute; left:0; bottom:0; width:100%; height:auto; aspect-ratio:832 / 633;
   display:block; pointer-events:none; user-select:none;
 }
-#screen-schedule .co-city{ z-index:0; }
-#screen-schedule .co-bushes{ z-index:3; }
+#screen-schedule .co-city, #screen-co2 .co-city{ z-index:0; }
+#screen-schedule .co-bushes, #screen-co2 .co-bushes{ z-index:3; }
 
 .sc-cloud{ position:absolute; z-index:1; height:auto; mix-blend-mode:multiply; pointer-events:none; opacity:.85; }
 .sc-cloud.c1{ left:calc(-40*var(--u)); top:calc(360*var(--u)); width:calc(430*var(--u)); }
@@ -2382,6 +2382,65 @@
 .sc-sp svg{ display:block; width:100%; height:auto; filter:drop-shadow(0 0 calc(3*var(--u)) #F2C200); }
 .sc-sp.a{ left:calc(645*var(--u)); top:calc(770*var(--u)); }
 .sc-sp.b{ left:calc(730*var(--u)); top:calc(815*var(--u)); width:calc(56*var(--u)); }
+
+/* ==== CO2 emissions avoided (prototype chart page) — built on the Truck(07) mock ==== */
+.sc-title.co2-title h2{ font-size:calc(42*var(--u)); }
+.sc-title.co2-title h2 sub, .co2-num sub, .co2-link sub{ font-size:.6em; vertical-align:baseline; position:relative; top:.28em; line-height:0; }
+.sc-co2link{
+  display:block; box-sizing:border-box; margin:calc(56*var(--u)) 0 0 calc(229*var(--u)); width:calc(567*var(--u)); padding:calc(12*var(--u)); border:0; cursor:pointer;
+  border-radius:calc(48*var(--u)); background:#FFEB5B; box-shadow:0 calc(14*var(--u)) calc(26*var(--u)) rgba(200,110,0,.2);
+  transition:transform .15s ease;
+}
+.sc-co2link:active{ transform:scale(.97); }
+.sc-co2link:focus-visible{ outline:3px solid #111; outline-offset:3px; }
+.sc-co2link span{
+  display:block; padding:calc(22*var(--u)) calc(18*var(--u)); border-radius:calc(38*var(--u)); background:linear-gradient(90deg,#FFDD57 0%,#FFB752 55%,#FF9048 100%);
+  font-family:var(--font-display); font-weight:400; font-size:calc(36*var(--u)); line-height:1.15; text-align:center; text-transform:uppercase;
+  color:#7CC644; paint-order:stroke fill; -webkit-text-stroke:calc(6*var(--u)) #fff;
+}
+.sc-co2{ margin-left:calc(53*var(--u)); width:calc(749*var(--u)); background:none; box-shadow:0 calc(18*var(--u)) calc(30*var(--u)) rgba(200,110,0,.22); padding:0; border-radius:calc(50*var(--u)); }
+.sc-co2 .sc-in{ border-radius:calc(50*var(--u)); padding:calc(40*var(--u)) calc(34*var(--u)) calc(44*var(--u)); display:flex; flex-direction:column; gap:calc(26*var(--u)); color:#fff; }
+.co2-kicker{ margin:0; text-align:center; font-size:calc(26*var(--u)); font-weight:800; letter-spacing:.04em; text-transform:uppercase; text-shadow:0 calc(2*var(--u)) 0 rgba(160,70,0,.55); }
+.co2-num{ margin:calc(-12*var(--u)) 0 0; text-align:center; font-family:var(--font-display); font-weight:400; font-size:calc(104*var(--u)); line-height:1.05; color:#7CC644; paint-order:stroke fill; -webkit-text-stroke:calc(12*var(--u)) #fff; }
+.co2-num small{ font-size:.42em; -webkit-text-stroke-width:calc(6*var(--u)); margin-left:calc(8*var(--u)); }
+.co2-eq{ margin:calc(-8*var(--u)) 0 0; text-align:center; font-size:calc(26*var(--u)); font-weight:800; text-shadow:0 calc(2*var(--u)) 0 rgba(160,70,0,.55); }
+.co2-tabs{ display:flex; justify-content:center; gap:calc(14*var(--u)); }
+.co2-tab{
+  flex:1; max-width:calc(190*var(--u)); border:0; cursor:pointer; padding:calc(14*var(--u)) 0; border-radius:calc(30*var(--u)); background:#FFEDC9;
+  font-family:var(--font-display); font-size:calc(28*var(--u)); text-transform:uppercase; color:#7CC644; -webkit-text-stroke:calc(3*var(--u)) #fff; paint-order:stroke fill;
+  transition:transform .15s ease, background .2s ease;
+}
+.co2-tab:active{ transform:scale(.95); }
+.co2-tab.on{ background:#7CC644; color:#fff; -webkit-text-stroke:calc(3*var(--u)) #009900; box-shadow:0 calc(4*var(--u)) 0 #009900; }
+.co2-tab:focus-visible, .co2-bar:focus-visible, .co2-shuffle:focus-visible{ outline:3px solid #111; outline-offset:2px; }
+.co2-chart{ position:relative; box-sizing:border-box; height:calc(430*var(--u)); padding:calc(58*var(--u)) calc(14*var(--u)) calc(44*var(--u)) calc(68*var(--u)); border-radius:calc(36*var(--u)); background:rgba(255,255,255,.3); }
+.co2-grid{ position:absolute; left:calc(68*var(--u)); right:calc(14*var(--u)); top:calc(58*var(--u)); bottom:calc(44*var(--u)); pointer-events:none; }
+.co2-gl{ position:absolute; left:0; right:0; height:0; border-top:calc(2*var(--u)) dashed rgba(255,255,255,.7); }
+.co2-gl span{ position:absolute; right:100%; margin-right:calc(10*var(--u)); transform:translateY(-52%); font-size:calc(21*var(--u)); font-weight:800; text-shadow:0 calc(1.5*var(--u)) 0 rgba(160,70,0,.5); }
+.co2-bars{ position:relative; height:100%; display:flex; align-items:stretch; gap:calc(8*var(--u)); }
+.co2-bar{ position:relative; flex:1 1 0; min-width:0; padding:0; border:0; background:none; cursor:pointer; display:flex; align-items:flex-end; justify-content:center; }
+.co2-fill{
+  width:78%; height:0; border-radius:calc(14*var(--u)) calc(14*var(--u)) calc(4*var(--u)) calc(4*var(--u)); background:linear-gradient(180deg,#9BE05A,#3E9F2A);
+  border:calc(3*var(--u)) solid #fff; box-sizing:border-box; transition:height .75s cubic-bezier(.2,.9,.25,1), background .2s ease, transform .2s ease;
+}
+.co2-bar:hover .co2-fill{ transform:translateY(calc(-4*var(--u))); }
+.co2-bar.sel .co2-fill{ background:linear-gradient(180deg,#FFF48A,#FFD23A); border-color:#009900; }
+.co2-lab{ position:absolute; top:100%; margin-top:calc(8*var(--u)); font-size:calc(21*var(--u)); font-weight:800; white-space:nowrap; text-shadow:0 calc(1.5*var(--u)) 0 rgba(160,70,0,.5); }
+.co2-tip{
+  position:absolute; z-index:2; padding:calc(6*var(--u)) calc(14*var(--u)); border-radius:calc(20*var(--u)); background:#FFEDC9; color:#009900; font-size:calc(22*var(--u)); font-weight:800; white-space:nowrap;
+  transform:translate(-50%,-100%); pointer-events:none; box-shadow:0 calc(4*var(--u)) 0 rgba(0,0,0,.14); transition:left .25s ease, top .25s ease, opacity .2s ease; opacity:0;
+}
+.co2-detail{ margin:0; text-align:center; font-size:calc(27*var(--u)); font-weight:800; line-height:1.3; text-shadow:0 calc(2*var(--u)) 0 rgba(160,70,0,.55); min-height:calc(36*var(--u)); }
+.co2-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:calc(12*var(--u)); }
+.co2-stat{ display:flex; flex-direction:column; align-items:center; gap:calc(2*var(--u)); padding:calc(14*var(--u)) calc(6*var(--u)); border-radius:calc(28*var(--u)); background:#FFEDC9; text-align:center; }
+.co2-stat b{ font-family:var(--font-display); font-weight:400; font-size:calc(40*var(--u)); line-height:1.1; color:#7CC644; paint-order:stroke fill; -webkit-text-stroke:calc(5*var(--u)) #fff; }
+.co2-stat span{ font-size:calc(21*var(--u)); font-weight:800; color:#009900; line-height:1.2; }
+.co2-shuffle{
+  align-self:center; border:0; cursor:pointer; padding:calc(16*var(--u)) calc(44*var(--u)); border-radius:calc(34*var(--u)); background:#7CC644; box-shadow:0 calc(6*var(--u)) 0 #009900;
+  font-family:var(--font-display); font-size:calc(30*var(--u)); text-transform:uppercase; color:#fff; -webkit-text-stroke:calc(4*var(--u)) #009900; paint-order:stroke fill; transition:transform .15s ease;
+}
+.co2-shuffle:active{ transform:translateY(calc(4*var(--u))); box-shadow:0 calc(2*var(--u)) 0 #009900; }
+@media (prefers-reduced-motion: reduce){ .co2-fill, .co2-tip{ transition:none; } }
 </style>
 </head>
 <body>
@@ -2568,7 +2627,7 @@
       <div class="home-bushes" aria-hidden="true"><img src="assets/bottom_bushes_clean.png" alt=""></div>
 
       <!-- Settings: placeholder for now, no action wired up yet -->
-      <button type="button" class="home-settings" id="homeSettingsBtn" aria-label="Settings (coming soon)">
+      <button type="button" class="home-settings" id="homeSettingsBtn" aria-label="Settings — CO2 emissions avoided">
         <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(0 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(45 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(90 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(135 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(180 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(225 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(270 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="7.4"/><circle class="hole" cx="12" cy="12" r="3.2"/></svg></span>
       </button>
     </section>
@@ -2699,12 +2758,57 @@
               </div>
             </div>
           </div>
+          <button type="button" class="sc-co2link" id="co2LinkBtn"><span class="co2-link">CO<sub>2</sub> Emissions<br>Avoided</span></button>
         </div>
         <img class="sc-cloud c1" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
         <img class="sc-cloud c2" src="assets/sc_cloud3.png" alt="" aria-hidden="true" draggable="false">
         <img class="sc-cloud c3" src="assets/sc_cloud.png" alt="" aria-hidden="true" draggable="false">
         <img class="sc-cloud c4" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
         <i class="sc-sp a"><svg viewBox='0 0 26 26'><path d='M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z' fill='#FFE84A'/></svg></i><i class="sc-sp b"><svg viewBox='0 0 26 26'><path d='M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z' fill='#FFE84A'/></svg></i>
+        <img class="co-bushes" src="assets/co_bushes.png" alt="" aria-hidden="true" draggable="false">
+      </div>
+    </section>
+
+    <!-- CO2 EMISSIONS AVOIDED (prototype chart, fake data) — built on the Truck(07) mock -->
+    <section class="screen" id="screen-co2">
+      <div class="tk-stage sc-stage">
+        <img class="co-city" src="assets/co_city.png" alt="" aria-hidden="true" draggable="false">
+        <div class="sc-head">
+          <img class="sc-cloud h1" src="assets/sc_cloud.png" alt="" aria-hidden="true" draggable="false">
+          <img class="sc-cloud h2" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
+          <img class="sc-cloud h3" src="assets/sc_cloud3.png" alt="" aria-hidden="true" draggable="false">
+          <button type="button" class="sc-home" id="co2BackBtn" aria-label="Back">Home</button>
+          <div class="sc-card sc-title co2-title"><div class="sc-in"><h2>CO<sub>2</sub> Emissions<br>Avoided</h2></div></div>
+        </div>
+        <div class="sc-list">
+          <div class="sc-card sc-co2">
+            <div class="sc-in">
+              <p class="co2-kicker" id="co2Kicker">Total avoided this week</p>
+              <p class="co2-num"><span id="co2Total">0</span><small>kg</small></p>
+              <p class="co2-eq" id="co2Eq"></p>
+              <div class="co2-tabs" role="tablist" aria-label="Time range">
+                <button type="button" class="co2-tab on" role="tab" data-p="week">Week</button>
+                <button type="button" class="co2-tab" role="tab" data-p="month">Month</button>
+                <button type="button" class="co2-tab" role="tab" data-p="year">Year</button>
+              </div>
+              <div class="co2-chart" id="co2Chart">
+                <div class="co2-grid" id="co2Grid"></div>
+                <div class="co2-bars" id="co2Bars"></div>
+                <div class="co2-tip" id="co2Tip"></div>
+              </div>
+              <p class="co2-detail" id="co2Detail" aria-live="polite"></p>
+              <div class="co2-stats">
+                <div class="co2-stat"><b id="co2Waste">0</b><span>kg waste<br>diverted</span></div>
+                <div class="co2-stat"><b id="co2Trees">0</b><span>trees for<br>a year</span></div>
+                <div class="co2-stat"><b id="co2Trips">0</b><span>landfill trips<br>saved</span></div>
+              </div>
+              <button type="button" class="co2-shuffle" id="co2Shuffle">Shuffle data</button>
+            </div>
+          </div>
+        </div>
+        <img class="sc-cloud c1" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
+        <img class="sc-cloud c2" src="assets/sc_cloud3.png" alt="" aria-hidden="true" draggable="false">
+        <i class="sc-sp" style="left:calc(690*var(--u)); top:calc(1180*var(--u));"><svg viewBox='0 0 26 26'><path d='M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z' fill='#FFE84A'/></svg></i>
         <img class="co-bushes" src="assets/co_bushes.png" alt="" aria-hidden="true" draggable="false">
       </div>
     </section>
@@ -4539,7 +4643,7 @@
 
   function canAccess(screenId){
     if (screenId === "screen-home") return !state.user;
-    if (screenId === "screen-schedule") return true;
+    if (screenId === "screen-schedule" || screenId === "screen-co2") return true;
     if (screenId === "screen-auth") return !state.user || !!state.pendingRole;
     if (screenId === "screen-request") return !!(state.user && state.user.role === "resident");
     if (screenId === "screen-track") return hasTrackAccess();
@@ -4572,7 +4676,7 @@
       shellEl.classList.toggle("is-request", screenId === "screen-request");
       shellEl.classList.toggle("is-track", screenId === "screen-track");
       shellEl.classList.toggle("is-collector", screenId === "screen-collector");
-      shellEl.classList.toggle("is-schedule", screenId === "screen-schedule");
+      shellEl.classList.toggle("is-schedule", screenId === "screen-schedule" || screenId === "screen-co2");
     }
 
     if (screenId === "screen-track") renderTrackList();
@@ -4595,6 +4699,15 @@
     if (schedBackBtn){
       schedBackBtn.addEventListener("click", function(){ goToScreen(roleHomeScreen()); });
     }
+    var co2From = "screen-schedule";   // where the CO2 page's back arrow returns to
+    var co2Link = document.getElementById("co2LinkBtn");
+    if (co2Link) co2Link.addEventListener("click", function(){ co2From = "screen-schedule"; goToScreen("screen-co2"); });
+    var gearBtn = document.getElementById("homeSettingsBtn");
+    if (gearBtn) gearBtn.addEventListener("click", function(){ co2From = "home"; goToScreen("screen-co2"); });
+    var co2Back = document.getElementById("co2BackBtn");
+    if (co2Back) co2Back.addEventListener("click", function(){
+      goToScreen(co2From === "home" ? roleHomeScreen() : "screen-schedule");
+    });
     document.querySelectorAll(".tab-btn").forEach(function(btn){
       btn.addEventListener("click", function(){ goToScreen(btn.dataset.screen); });
     });
@@ -4683,6 +4796,132 @@
   if (document.readyState === "loading"){
     document.addEventListener("DOMContentLoaded", init);
   } else { init(); }
+})();
+</script>
+<script>
+/* CO2 Emissions Avoided — prototype chart. All numbers are randomly generated for show. */
+(function(){
+  var screen = document.getElementById("screen-co2");
+  if (!screen) return;
+  var CFG = {
+    week:  { labels:["Mon","Tue","Wed","Thu","Fri","Sat","Sun"], lo:25,  hi:95,   word:"this week",  unit:"day" },
+    month: { labels:["Wk 1","Wk 2","Wk 3","Wk 4"],               lo:240, hi:430,  word:"this month", unit:"week" },
+    year:  { labels:["J","F","M","A","M","J","J","A","S","O","N","D"], lo:850, hi:1750, word:"this year", unit:"month" },
+    full:  { year:["January","February","March","April","May","June","July","August","September","October","November","December"] }
+  };
+  var seeds = { week:11, month:23, year:37 };
+  var period = "week", data = [], sel = 0;
+  var $ = function(id){ return document.getElementById(id); };
+  var barsEl = $("co2Bars"), gridEl = $("co2Grid"), chartEl = $("co2Chart"), tipEl = $("co2Tip");
+
+  function rng(seed){ // small seeded random so each range has stable "fake" data until shuffled
+    return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  function build(){
+    var c = CFG[period], r = rng(seeds[period]);
+    data = c.labels.map(function(){ return Math.round((c.lo + r() * (c.hi - c.lo)) * 10) / 10; });
+    sel = data.length - 1;
+  }
+  function niceMax(v){
+    var steps = [50,100,120,200,250,400,500,600,1000,1200,1500,2000,2500];
+    for (var i = 0; i < steps.length; i++) if (v <= steps[i]) return steps[i];
+    return Math.ceil(v / 500) * 500;
+  }
+  function fullLabel(i){
+    if (period === "week") return ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][i];
+    if (period === "month") return "Week " + (i + 1);
+    return CFG.full.year[i];
+  }
+  function fmt(n, d){ return n.toLocaleString("en-US", { minimumFractionDigits:d||0, maximumFractionDigits:d||0 }); }
+
+  function countTo(el, to, dec){
+    var from = parseFloat(String(el.dataset.v || "0")) || 0, t0 = performance.now(), dur = 700;
+    el.dataset.v = to;
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches){ el.textContent = fmt(to, dec); return; }
+    (function step(now){
+      var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = fmt(from + (to - from) * e, dec);
+      if (k < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+
+  function placeTip(){
+    var btn = barsEl.children[sel]; if (!btn) return;
+    var max = niceMax(Math.max.apply(null, data));
+    var cr = chartEl.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    var barsRect = barsEl.getBoundingClientRect();
+    var top = barsRect.top - cr.top + barsRect.height * (1 - data[sel] / max) - 6;
+    tipEl.style.left = (br.left - cr.left + br.width / 2) + "px";
+    tipEl.style.top = Math.max(18, top) + "px";
+    tipEl.textContent = fmt(data[sel], 1) + " kg";
+    tipEl.style.opacity = 1;
+  }
+  function select(i){
+    sel = i;
+    Array.prototype.forEach.call(barsEl.children, function(b, k){
+      b.classList.toggle("sel", k === i); b.setAttribute("aria-pressed", k === i ? "true" : "false");
+    });
+    var total = data.reduce(function(a, b){ return a + b; }, 0);
+    var share = Math.round(data[i] / total * 100);
+    $("co2Detail").innerHTML = fullLabel(i) + ": <b>" + fmt(data[i], 1) + " kg</b> CO<sub style=\"font-size:.6em\">2</sub> avoided · " + share + "% of the " + CFG[period].word.replace("this ", "");
+    placeTip();
+  }
+
+  function render(animate){
+    var c = CFG[period];
+    var total = data.reduce(function(a, b){ return a + b; }, 0);
+    var max = niceMax(Math.max.apply(null, data));
+
+    $("co2Kicker").textContent = "Total avoided " + c.word;
+    countTo($("co2Total"), Math.round(total * 10) / 10, 1);
+    $("co2Eq").textContent = "≈ " + fmt(total / 21, 0) + " trees absorbing CO₂ for a year";
+    countTo($("co2Waste"), Math.round(total * 2.4), 0);
+    countTo($("co2Trees"), Math.round(total / 21), 0);
+    countTo($("co2Trips"), Math.round(total / 12), 0);
+
+    gridEl.innerHTML = "";
+    for (var g = 0; g <= 4; g++){
+      var gl = document.createElement("div"); gl.className = "co2-gl"; gl.style.top = (100 - g * 25) + "%";
+      gl.innerHTML = "<span>" + fmt(max * g / 4, 0) + "</span>"; gridEl.appendChild(gl);
+    }
+
+    barsEl.innerHTML = "";
+    data.forEach(function(v, i){
+      var b = document.createElement("button"); b.type = "button"; b.className = "co2-bar";
+      b.setAttribute("aria-label", fullLabel(i) + ": " + fmt(v, 1) + " kg");
+      var f = document.createElement("div"); f.className = "co2-fill"; f.style.transitionDelay = (i * 45) + "ms";
+      var l = document.createElement("span"); l.className = "co2-lab"; l.textContent = c.labels[i];
+      b.appendChild(f); b.appendChild(l); barsEl.appendChild(b);
+      b.addEventListener("click", function(){ select(i); });
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ f.style.height = (v / max * 100) + "%"; }); });
+    });
+    tipEl.style.opacity = 0;
+    select(sel);
+    setTimeout(placeTip, animate ? 900 : 60);
+  }
+
+  Array.prototype.forEach.call(screen.querySelectorAll(".co2-tab"), function(t){
+    t.addEventListener("click", function(){
+      period = t.dataset.p;
+      Array.prototype.forEach.call(screen.querySelectorAll(".co2-tab"), function(o){
+        o.classList.toggle("on", o === t); o.setAttribute("aria-selected", o === t ? "true" : "false");
+      });
+      build(); render(true);
+    });
+  });
+  $("co2Shuffle").addEventListener("click", function(){
+    seeds[period] = Math.floor(Math.random() * 100000) + 1; build(); render(true);
+  });
+  window.addEventListener("resize", function(){ if (screen.classList.contains("active")) placeTip(); });
+
+  // replay the bars every time the page is opened
+  new MutationObserver(function(){
+    if (screen.classList.contains("active")) { if (!screen.dataset.shown) { screen.dataset.shown = "1"; } render(true); }
+    else screen.dataset.shown = "";
+  }).observe(screen, { attributes:true, attributeFilter:["class"] });
+
+  build(); render(false);
 })();
 </script>
 </body>
