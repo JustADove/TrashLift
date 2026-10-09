@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>TrashLift — BF Homes Trash Pickup</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
@@ -964,6 +965,20 @@
   .ai-result.bad{ background:rgba(193,84,47,0.10); border-color:var(--clay); }
   .ai-result.bad .ai-title{ color:var(--clay); }
   .ai-result.warn{ background:rgba(233,162,59,0.16); border-color:var(--amber); }
+  .ai-result .ai-actions{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .ai-result .ai-actions button{
+    flex:1 1 auto; padding:10px 12px; border-radius:10px; cursor:pointer;
+    border:1.5px solid var(--card-border); background:#fff; color:var(--text-primary);
+    font-family:var(--font-body); font-weight:800; font-size:13px;
+  }
+  .ai-result .ai-actions button.primary{ background:var(--amber); border-color:var(--amber); color:var(--green-900); }
+  .ai-result .ai-actions button:active{ transform:scale(.97); }
+  .camera-overlay .cam-hint{
+    position:absolute; z-index:2; left:50%; transform:translateX(-50%);
+    top:calc(14px + env(safe-area-inset-top,0px)); max-width:calc(100% - 28px);
+    padding:8px 14px; border-radius:999px; background:rgba(12,20,17,.72); color:#fff;
+    font-family:var(--font-body); font-size:13px; font-weight:700; text-align:center; pointer-events:none;
+  }
   @media (prefers-reduced-motion: reduce){
     .scan-line{ animation:none; top:50%; }
     .ai-stamp.show{ animation:none; }
@@ -2149,11 +2164,12 @@
   .co-win.map{ margin-top:calc(30*var(--u)); height:calc(300*var(--u)); }
   .co-photo{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
   .co-nophoto{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#7CC644; font-family:var(--font-display); font-size:calc(28*var(--u)); text-transform:uppercase; }
-  .co-from, .co-note{
+  .co-from, .co-note, .co-flag{
     position:absolute; z-index:2; box-sizing:border-box; max-width:calc(100% - 24*var(--u)); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     padding:calc(8*var(--u)) calc(18*var(--u)); border-radius:999px; background:rgba(0,90,0,.8); color:#fff; font-size:calc(21*var(--u)); font-weight:700; line-height:1.2;
   }
   .co-from{ top:calc(12*var(--u)); left:calc(12*var(--u)); }
+  .co-flag{ top:calc(12*var(--u)); right:calc(12*var(--u)); background:rgba(193,84,47,.92); }
   .co-note{ left:calc(12*var(--u)); bottom:calc(12*var(--u)); }
 
   .co-tl{ margin:calc(21*var(--u)) calc(16*var(--u)) 0 calc(37*var(--u)); }
@@ -2463,7 +2479,6 @@
   </div>
   <div class="intro-skip">Tap to skip</div>
 </div>
-<audio id="introSfx" src="assets/intro.mp3" preload="auto"></audio>
 <script>
 (function(){
   var intro = document.getElementById("intro");
@@ -2477,30 +2492,10 @@
   });
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var done = false, t1, t2;
-  // Intro sound: starts ~0.9s in so its hits land on the truck drop, the dot, and the TRASHLIFT letters.
-  // Browsers may block autoplay until the person interacts; if so the intro just plays silently.
-  var sfx = document.getElementById("introSfx");
-  var sfxTimer = null;
-  if (sfx && !reduce){
-    sfx.volume = 0.8;
-    sfxTimer = setTimeout(function(){
-      var p = sfx.play();
-      if (p && p.catch) p.catch(function(){});
-    }, 900);
-  }
-  function fadeSfx(){
-    clearTimeout(sfxTimer);
-    if (!sfx || sfx.paused) return;
-    var f = setInterval(function(){
-      if (sfx.volume > 0.12){ sfx.volume = Math.max(0, sfx.volume - 0.12); }
-      else { clearInterval(f); sfx.pause(); }
-    }, 30);
-  }
   function finish(){
     if (done) return;
     done = true;
     clearTimeout(t1); clearTimeout(t2);
-    fadeSfx();
     intro.classList.add("out");
     // Start the Home load animations as the splash fades away
     setTimeout(function(){
@@ -2878,6 +2873,7 @@
   <div class="camera-overlay" id="cameraOverlay" aria-hidden="true">
     <video id="cameraVideo" autoplay playsinline muted></video>
     <canvas id="cameraCanvas" hidden></canvas>
+    <div class="cam-hint" id="cameraHintBar">Get the garbage in the frame \u00b7 1\u20132 m away \u00b7 good light</div>
     <div class="cam-bar">
       <button type="button" class="cam-cancel" id="cameraCancelBtn">Cancel</button>
       <button type="button" class="cam-shot" id="cameraShotBtn">Take photo</button>
@@ -3019,7 +3015,7 @@
     geoWatchId: null,
     lastPostedLoc: null,
     trashPhoto: null,
-    ai: { status: "idle", result: null },   // idle | scanning | trash | not_trash | unavailable
+    ai: { status: "idle", result: null },   // idle | scanning | trash | not_trash | override | unavailable
     cameraStream: null,
     cameraMode: "pickup", // "pickup" | "chat"
     pendingRole: null,
@@ -3550,12 +3546,12 @@
   // If the AI service can't be reached (no API key, offline, timeout), residents can still
   // submit by picking the type themselves. Set AI_STRICT = true to block submits instead.
   var AI_STRICT = false;
-  var AI_TIMEOUT_MS = 25000;
+  var AI_TIMEOUT_MS = 40000;
   var aiScanSeq = 0;
 
   function aiAllowsSubmit(){
     var s = state.ai.status;
-    return s === "trash" || (s === "unavailable" && !AI_STRICT);
+    return s === "trash" || s === "override" || (s === "unavailable" && !AI_STRICT);
   }
 
   function updateSubmitState(){
@@ -3575,7 +3571,7 @@
     updateSubmitState();
   }
 
-  function setAiPanel(kind, title, body){
+  function setAiPanel(kind, title, body, actions){
     var panel = document.getElementById("aiResult");
     panel.className = "ai-result" + (kind ? " show " + kind : "");
     panel.innerHTML = "";
@@ -3590,6 +3586,31 @@
       b.textContent = body;   // model text goes in as text, never HTML
       panel.appendChild(b);
     }
+    if (actions && actions.length){
+      var row = document.createElement("div");
+      row.className = "ai-actions";
+      actions.forEach(function(a){
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = a.label;
+        if (a.primary) btn.className = "primary";
+        btn.addEventListener("click", a.onClick);
+        row.appendChild(btn);
+      });
+      panel.appendChild(row);
+    }
+  }
+
+  function retryAiScan(){
+    if (state.trashPhoto) runAiScan(state.trashPhoto);
+  }
+
+  function sendAnyway(){
+    // The AI said NOT TRASH but the resident disagrees: let them continue, flagged for the collector to check.
+    if (state.ai.status !== "not_trash") return;
+    state.ai = { status: "override", result: state.ai.result };
+    renderAi();
+    updateSubmitState();
   }
 
   function renderAi(){
@@ -3603,6 +3624,7 @@
       document.getElementById("cameraHint").textContent = "This photo can't be sent. Retake it with the garbage in view.";
     }
     card.classList.toggle("ai-bad", a.status === "not_trash");
+    document.getElementById("aiStamp").classList.toggle("show", a.status === "not_trash");
     card.classList.toggle("ai-ok", a.status === "trash");
 
     if (a.status === "scanning"){
@@ -3619,9 +3641,15 @@
     } else if (a.status === "not_trash"){
       var nr = a.result;
       setAiPanel("bad", "NOT TRASH",
-        (nr.label ? "Looks like: " + nr.label + ". " : "") + (nr.reason || "") + " Retake a photo with the garbage in the frame.");
+        (nr.label ? "Looks like: " + nr.label + ". " : "") + (nr.reason || "") + " Retake a photo with the garbage in the frame.",
+        [{ label: "Send anyway", onClick: sendAnyway }]);
+    } else if (a.status === "override"){
+      document.getElementById("cameraHint").textContent = "Sending anyway. A collector will check this photo.";
+      setAiPanel("warn", "Sending without AI approval",
+        "Pick the trash type below. The collector will see that the AI wasn't sure.");
     } else if (a.status === "unavailable"){
-      setAiPanel("warn", "AI check unavailable", a.error + " Pick the trash type yourself below.");
+      setAiPanel("warn", "AI check unavailable", a.error + " Pick the trash type yourself below, or try again.",
+        [{ label: "Try again", onClick: retryAiScan, primary: true }]);
     } else {
       setAiPanel(null);
     }
@@ -3724,6 +3752,10 @@
       return;
     }
     var overlay = document.getElementById("cameraOverlay");
+    var hintBar = document.getElementById("cameraHintBar");
+    if (hintBar) hintBar.textContent = state.cameraMode === "chat"
+      ? "Show the cleaned-up spot or the pickup"
+      : "Get the garbage in the frame \u00b7 1\u20132 m away \u00b7 good light";
     document.body.dataset.camScrollY = String(window.scrollY || window.pageYOffset || 0);
     document.body.classList.add("cam-lock");
     closeAccountSheet();
@@ -3744,6 +3776,19 @@
     });
   }
 
+  // Average brightness of a tiny copy of the frame (0-255). Under ~45 the AI usually can't see the waste.
+  function isTooDark(canvas){
+    try{
+      var t = document.createElement("canvas");
+      t.width = 24; t.height = 24;
+      var c = t.getContext("2d");
+      c.drawImage(canvas, 0, 0, 24, 24);
+      var d = c.getImageData(0, 0, 24, 24).data, sum = 0;
+      for (var i = 0; i < d.length; i += 4) sum += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      return (sum / (d.length / 4)) < 45;
+    }catch(e){ return false; }
+  }
+
   function captureLiveFrame(){
     var video = document.getElementById("cameraVideo");
     var canvas = document.getElementById("cameraCanvas");
@@ -3753,19 +3798,21 @@
       if (mode === "chat") showChatStatus(startingMsg, true); else showStatus(startingMsg, true);
       return;
     }
-    var maxW = 960;
+    var maxW = 1280;
     var scale = Math.min(1, maxW / video.videoWidth);
     canvas.width = Math.round(video.videoWidth * scale);
     canvas.height = Math.round(video.videoHeight * scale);
     var ctx = canvas.getContext("2d");
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    var dataUrl = canvas.toDataURL("image/jpeg", 0.72);
+    var dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    var tooDark = isTooDark(canvas);
     closeCameraOverlay();
     if (mode === "chat"){
       sendChatPhoto(dataUrl);
     } else {
       setCapturedPhoto(dataUrl);
-      showStatus("", false);
+      if (tooDark) showStatus("This photo looks dark. For a better AI check, retake it with more light.", true);
+      else showStatus("", false);
     }
   }
 
@@ -4000,7 +4047,9 @@
         aiChecked: !!aiRes,
         aiCategory: aiRes ? aiRes.category : null,
         aiLabel: aiRes ? aiRes.label : null,
-        aiConfidence: aiRes ? aiRes.confidence : null
+        aiConfidence: aiRes ? aiRes.confidence : null,
+        aiOverride: state.ai.status === "override",
+        aiOverrideLabel: state.ai.status === "override" && state.ai.result ? state.ai.result.label : null
       };
 
       showStatus("", false);
@@ -4533,6 +4582,7 @@
         ? '<img class="co-photo" src="' + escapeHtml(r.photoUrl) + '" alt="Live trash photo from resident">'
         : '<div class="co-nophoto">No photo</div>') +
       (r.residentName ? '<div class="co-from">From: ' + escapeHtml(r.residentName) + '</div>' : '') +
+      (r.aiOverride ? '<div class="co-flag">AI unsure \u2014 check photo</div>' : '') +
       (r.note ? '<div class="co-note">' + escapeHtml(r.note) + '</div>' : '');
 
     var mapWin =
