@@ -354,7 +354,7 @@ async function askModel(model, mediaType, b64, timeoutMs){
     var detail = "";
     try{ detail = (await resp.text()).slice(0, 300); }catch(e){}
     console.warn("AI upstream error", model, resp.status, detail);
-    throw httpError(502, "AI service error (" + resp.status + ")", "upstream");
+    throw httpError(resp.status === 503 ? 503 : 502, resp.status === 503 ? "The AI is busy right now. Please try again in a few seconds." : "AI service error (" + resp.status + ")", "upstream");
   }
   var data = await resp.json();
   var block = (data.content || []).filter(function(b){ return b.type === "tool_use" && b.name === "report_waste"; })[0];
@@ -417,8 +417,13 @@ async function askGemini(mediaType, b64, timeoutMs){
     var url = GEMINI_BASE + encodeURIComponent(usedGemini) + ":generateContent";
     resp = await once(url, 0);
     if (resp.status === 400) resp = await once(url, 1);   // thinkingLevel not accepted -> use model default
-    if (resp.status !== 404) break;                        // 404 = model gone, try the next one
-    console.warn("Gemini model unavailable:", usedGemini);
+    if (resp.status === 503 || resp.status === 500){       // overloaded: one quick retry on the same model
+      await new Promise(function(r){ setTimeout(r, 800); });
+      resp = await once(url, 0);
+      if (resp.status === 400) resp = await once(url, 1);
+    }
+    if (resp.status !== 404 && resp.status !== 503 && resp.status !== 500) break;   // gone or overloaded -> try the next model
+    console.warn("Gemini model unavailable:", usedGemini, resp.status);
   }
   if (usedGemini !== GEMINI_MODEL && resp.ok) GEMINI_MODEL = usedGemini;   // remember the one that works
   if (!resp.ok){
@@ -426,7 +431,7 @@ async function askGemini(mediaType, b64, timeoutMs){
     try{ detail = (await resp.text()).slice(0, 300); }catch(e){}
     console.warn("Gemini error", usedGemini, resp.status, detail);
     if (resp.status === 429) throw httpError(429, "The free AI limit was reached. Try again in a minute.", "rate");
-    throw httpError(502, "AI service error (" + resp.status + ")", "upstream");
+    throw httpError(resp.status === 503 ? 503 : 502, resp.status === 503 ? "The AI is busy right now. Please try again in a few seconds." : "AI service error (" + resp.status + ")", "upstream");
   }
   var data = await resp.json();
   var parts = (((data.candidates || [])[0] || {}).content || {}).parts || [];
