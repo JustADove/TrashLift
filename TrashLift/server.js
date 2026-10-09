@@ -219,7 +219,9 @@ var AI_MODEL_STRONG = process.env.TRASHLIFT_AI_MODEL_STRONG || "claude-sonnet-5-
 var AI_URL = process.env.ANTHROPIC_API_URL || "https://api.anthropic.com/v1/messages";
 // Free option: Google Gemini (free key from https://aistudio.google.com). Used when GEMINI_API_KEY is set
 // and ANTHROPIC_API_KEY is not (or force it with AI_PROVIDER=gemini / AI_PROVIDER=anthropic).
-var GEMINI_MODEL = process.env.TRASHLIFT_GEMINI_MODEL || "gemini-2.5-flash";
+var GEMINI_MODEL = process.env.TRASHLIFT_GEMINI_MODEL || "gemini-3.8-flash";
+// If the model above is retired/unavailable (404), these are tried in order.
+var GEMINI_FALLBACKS = ["gemini-3.6-flash", "gemini-3.5-flash"];
 var GEMINI_BASE = process.env.GEMINI_API_URL || "https://generativelanguage.googleapis.com/v1beta/models/";
 
 function pickProvider(){
@@ -363,7 +365,6 @@ async function askModel(model, mediaType, b64, timeoutMs){
 // Same job as askModel, but through Google's Gemini API (free tier).
 async function askGemini(mediaType, b64, timeoutMs){
   var key = process.env.GEMINI_API_KEY;
-  var url = GEMINI_BASE + encodeURIComponent(GEMINI_MODEL) + ":generateContent";
   var schema = {
     type: "OBJECT",
     properties: {
@@ -375,14 +376,15 @@ async function askGemini(mediaType, b64, timeoutMs){
     },
     required: ["is_trash", "label", "confidence", "reason"]
   };
-  function body(withThinkingOff){
+  // Gemini 3.x: custom temperature is not supported (so it is left out), and thinking is set with
+  // thinkingLevel instead of thinkingBudget. mode 0 = minimal thinking, mode 1 = model default.
+  function body(mode){
     var cfg = {
       responseMimeType: "application/json",
       responseSchema: schema,
-      temperature: 0,
-      maxOutputTokens: 1024
+      maxOutputTokens: 2048
     };
-    if (withThinkingOff) cfg.thinkingConfig = { thinkingBudget: 0 };   // faster/cheaper, and keeps the JSON from being cut off
+    if (mode === 0) cfg.thinkingConfig = { thinkingLevel: "minimal" };   // faster/cheaper, keeps the JSON from being cut off
     return JSON.stringify({
       systemInstruction: { parts: [{ text: AI_SYSTEM.replace("Always answer by calling report_waste.", "Always answer with the JSON object only.") }] },
       contents: [{ role: "user", parts: [
@@ -392,7 +394,7 @@ async function askGemini(mediaType, b64, timeoutMs){
       generationConfig: cfg
     });
   }
-  async function once(withThinkingOff){
+  async function once(url, mode){
     var ctrl = new AbortController();
     var timer = setTimeout(function(){ ctrl.abort(); }, timeoutMs);
     try{
@@ -400,7 +402,7 @@ async function askGemini(mediaType, b64, timeoutMs){
         method: "POST",
         signal: ctrl.signal,
         headers: { "content-type": "application/json", "x-goog-api-key": key },
-        body: body(withThinkingOff)
+        body: body(mode)
       });
     }catch(e){
       throw httpError(502, e.name === "AbortError" ? "AI timed out" : "Could not reach the AI service", "upstream");
@@ -408,12 +410,21 @@ async function askGemini(mediaType, b64, timeoutMs){
       clearTimeout(timer);
     }
   }
-  var resp = await once(true);
-  if (resp.status === 400) resp = await once(false);   // some models don't accept thinkingBudget 0
+  var models = [GEMINI_MODEL].concat(GEMINI_FALLBACKS.filter(function(m){ return m !== GEMINI_MODEL; }));
+  var resp = null, usedGemini = GEMINI_MODEL;
+  for (var i = 0; i < models.length; i++){
+    usedGemini = models[i];
+    var url = GEMINI_BASE + encodeURIComponent(usedGemini) + ":generateContent";
+    resp = await once(url, 0);
+    if (resp.status === 400) resp = await once(url, 1);   // thinkingLevel not accepted -> use model default
+    if (resp.status !== 404) break;                        // 404 = model gone, try the next one
+    console.warn("Gemini model unavailable:", usedGemini);
+  }
+  if (usedGemini !== GEMINI_MODEL && resp.ok) GEMINI_MODEL = usedGemini;   // remember the one that works
   if (!resp.ok){
     var detail = "";
     try{ detail = (await resp.text()).slice(0, 300); }catch(e){}
-    console.warn("Gemini error", GEMINI_MODEL, resp.status, detail);
+    console.warn("Gemini error", usedGemini, resp.status, detail);
     if (resp.status === 429) throw httpError(429, "The free AI limit was reached. Try again in a minute.", "rate");
     throw httpError(502, "AI service error (" + resp.status + ")", "upstream");
   }
