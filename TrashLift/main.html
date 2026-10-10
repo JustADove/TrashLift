@@ -6,6 +6,9 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <title>TrashLift — BF Homes Trash Pickup</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   @font-face{
     font-family:'Frogie';
@@ -14,6 +17,219 @@
     font-style:normal;
     font-display:block;
   }
+
+/* ================= FRONT PAGE (slide to get started) — from Figma "front page 1" (440 x 956) ================= */
+.shell.is-front{ background-color:#FFFFFF; background-image:none; animation:none; }
+.shell.is-front header.topbar,
+.shell.is-front nav.tabbar{ display:none; }
+.shell.is-front main{ position:relative; padding:0; overflow:hidden; }
+
+#screen-front{
+  position:absolute; inset:0;
+  container-type:inline-size;
+  --u: calc(100cqw / 440);            /* 1 Figma px */
+  --fp-green:#00A925;
+  --fp-mint:#61FF89;
+  background:#FFFFFF;
+  overflow:hidden;
+  font-family:'Fredoka', var(--font-body);
+  user-select:none; -webkit-user-select:none;
+}
+#screen-front .fp-brand{ position:absolute; left:0; top:0; width:100%; height:calc(var(--u)*90); }
+#screen-front .fp-logo-truck{ position:absolute; left:calc(var(--u)*28); top:calc(var(--u)*29); width:calc(var(--u)*48); height:calc(var(--u)*48); }
+#screen-front .fp-word{
+  position:absolute; left:calc(var(--u)*76); top:0;
+  font-family:'Cherry Bomb One','Fredoka',var(--font-body);
+  font-size:calc(var(--u)*20); line-height:calc(var(--u)*90);
+  color:var(--fp-green); white-space:nowrap;
+}
+#screen-front .fp-arrow{ position:absolute; left:calc(var(--u)*79); top:calc(var(--u)*55); width:calc(var(--u)*120); height:calc(var(--u)*13); overflow:visible; }
+#screen-front .fp-title{
+  position:absolute; left:calc(var(--u)*28); top:calc(var(--u)*73);
+  width:calc(var(--u)*255); margin:0;
+  font-family:'Fredoka', var(--font-body); font-weight:500;
+  font-size:calc(var(--u)*40); line-height:1.2; color:#000;
+}
+/* blob + truck group: centred in the space between the headline and the slider */
+#screen-front .fp-art{
+  position:absolute; left:calc(var(--u)*25);
+  top:max(calc(54.8% - var(--u)*255.5), calc(var(--u)*268));
+  width:calc(var(--u)*487); height:calc(var(--u)*511);
+  pointer-events:none;
+}
+#screen-front .fp-blob{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+#screen-front .fp-garbage{
+  position:absolute; left:calc(var(--u)*55); top:calc(var(--u)*89);
+  width:calc(var(--u)*473); height:auto; display:block;
+  opacity:0; transform-origin:50% 88%;      /* hidden until JS adds .truck-go (so sound and motion start together) */
+}
+#screen-front.truck-go .fp-garbage{ animation:fpTruckDrive 1.7s linear both; }
+/* the truck faces left, so it drives in from the right edge, brakes, nose dips, settles */
+@keyframes fpTruckDrive{
+  0%{   transform:translateX(100%); opacity:1; animation-timing-function:cubic-bezier(.12,.7,.25,1); }
+  72%{  transform:translateX(-1.5%) rotate(0deg); opacity:1; animation-timing-function:ease-in-out; }
+  86%{  transform:translateX(0) rotate(-1.1deg); opacity:1; animation-timing-function:ease-out; }
+  100%{ transform:none; opacity:1; }
+}
+
+/* the slider — per Figma frames 1-4: the mint track is "eaten" from the left as the knob slides right,
+   ending as a small pill (107px wide) at the right edge; then the knob bursts into a circle (frames 5-9). */
+#screen-front .fp-slide{
+  position:absolute; left:calc(var(--u)*25); bottom:calc(var(--u)*45);
+  width:calc(var(--u)*390); height:calc(var(--u)*90);
+  --p:0; --x:0px; --tl:0px;
+}
+#screen-front .fp-track{
+  position:absolute; top:0; bottom:0; right:0; left:var(--tl);
+  border-radius:calc(var(--u)*121);
+  background:var(--fp-mint);
+  box-shadow:0 calc(var(--u)*4) calc(var(--u)*25) calc(var(--u)*3) rgba(0,0,0,.25);
+  overflow:hidden;
+}
+#screen-front .fp-label{
+  position:absolute; top:0; bottom:0;
+  left:calc(var(--u)*141 - var(--tl));      /* stays put on screen while the track shrinks past it */
+  width:calc(var(--u)*151);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:500; font-size:calc(var(--u)*24); letter-spacing:.1em; color:#fff; white-space:nowrap;
+  opacity:calc(1 - var(--p) * 3);
+  pointer-events:none;
+}
+#screen-front .fp-knob{
+  position:absolute; left:calc(var(--u)*9); top:calc(var(--u)*9); z-index:2;
+  width:calc(var(--u)*72); height:calc(var(--u)*72);
+  border:0; padding:0; border-radius:50%;
+  background:#fff;
+  box-shadow:0 calc(var(--u)*3) calc(var(--u)*10) rgba(0,0,0,.22);
+  display:flex; align-items:center; justify-content:center;
+  cursor:grab; touch-action:none;
+  transform:translateX(var(--x));
+  -webkit-tap-highlight-color:transparent;
+}
+#screen-front .fp-knob:active{ cursor:grabbing; }
+#screen-front .fp-knob:focus-visible{ outline:3px solid var(--fp-green); outline-offset:3px; }
+#screen-front .fp-knob svg{ width:calc(var(--u)*34); height:calc(var(--u)*29); display:block; transition:opacity .15s ease; }
+#screen-front.bursting .fp-knob svg{ opacity:0; }
+#screen-front .fp-slide.snap .fp-knob{ transition:transform .24s cubic-bezier(.2,.8,.2,1); }
+#screen-front .fp-slide.snap .fp-track{ transition:left .24s cubic-bezier(.2,.8,.2,1); }
+#screen-front .fp-slide.snap .fp-label{ transition:left .24s cubic-bezier(.2,.8,.2,1), opacity .24s ease; }
+/* mint (#61FF89) circle that grows out of the knob and fills the screen (Figma frames 5-9) */
+#screen-front .fp-burst{
+  position:absolute; inset:0; z-index:20;
+  background:#61FF89; pointer-events:none;
+  visibility:hidden; clip-path:circle(0px at 50% 50%);
+}
+@media (prefers-reduced-motion: reduce){
+  #screen-front.truck-go .fp-garbage, #screen-front .fp-garbage{ animation:none; opacity:1; }
+  #screen-front .fp-burst{ transition-duration:.01s !important; }
+}
+
+/* ================= MAIN SCREEN — from Figma "Main screen 1/2/3" (440 x 956) =================
+   colours: background #61FF89 · banner #06721D · button #00A925 · text #000 · card #FFF            */
+#screen-home{
+  container-type:size;
+  --u: min(calc(100cqw / 440), calc(100cqh / 956));   /* 1 Figma px — fits the design to the screen */
+  --mm-bg:#61FF89; --mm-dark:#06721D; --mm-btn:#00A925;
+  background:var(--mm-bg);
+  overflow:hidden;
+  animation:none;
+  font-family:'Fredoka', var(--font-body);
+  -webkit-user-select:none; user-select:none;
+  touch-action:pan-y;
+}
+#screen-home .mm-banner{
+  position:absolute; left:0; top:0; width:100%; height:calc(var(--u)*176);
+  display:block; pointer-events:none;
+}
+#screen-home .mm-frame{
+  position:absolute; top:0; left:50%;
+  width:calc(var(--u)*440); height:calc(var(--u)*956);
+  transform:translateX(-50%);
+}
+#screen-home .mm-brand{ position:absolute; left:0; top:0; width:100%; height:calc(var(--u)*120); pointer-events:none; }
+#screen-home .mm-logo-truck{ position:absolute; left:calc(var(--u)*82); top:calc(var(--u)*55); width:calc(var(--u)*88.7); height:calc(var(--u)*58); }
+#screen-home .mm-word{
+  position:absolute; left:calc(var(--u)*172.7); top:calc(var(--u)*22);
+  font-family:'Cherry Bomb One','Fredoka',var(--font-body);
+  font-size:calc(var(--u)*32); line-height:calc(var(--u)*90.6);
+  color:#FFFFFF; white-space:nowrap;
+}
+#screen-home .mm-arrow{ position:absolute; left:calc(var(--u)*175.8); top:calc(var(--u)*83.4); width:calc(var(--u)*179); height:calc(var(--u)*17); overflow:visible; }
+
+#screen-home .mm-lower{
+  position:absolute; left:0; right:0; bottom:0;
+  height:calc(var(--u)*820);            /* design y 136 -> 956 */
+}
+#screen-home .mm-card{
+  position:absolute; left:calc(var(--u)*45); top:calc(var(--u)*316);
+  width:calc(var(--u)*350); height:calc(var(--u)*471);
+  background:#FFFFFF; border-radius:calc(var(--u)*46);
+}
+#screen-home .mm-shadow{
+  position:absolute; width:calc(var(--u)*200); height:calc(var(--u)*62);
+  border-radius:50%; background:rgba(0,0,0,.42);
+  filter:blur(calc(var(--u)*14));
+  transition:left .5s cubic-bezier(.3,.8,.2,1), top .5s cubic-bezier(.3,.8,.2,1);
+}
+#screen-home .mm-item{
+  position:absolute; z-index:2; padding:0; margin:0; border:0; background:none;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:left .5s cubic-bezier(.3,.8,.2,1), top .5s cubic-bezier(.3,.8,.2,1),
+             width .5s cubic-bezier(.3,.8,.2,1), height .5s cubic-bezier(.3,.8,.2,1);
+}
+#screen-home .mm-item[data-slot="c"]{ z-index:3; cursor:default; }
+#screen-home .mm-item img{ width:100%; height:100%; object-fit:contain; display:block; pointer-events:none; }
+#screen-home .mm-item:focus-visible{ outline:3px solid #fff; outline-offset:4px; border-radius:24px; }
+#screen-home .mm-item.pop img{ animation:mmPop .4s ease; }
+@keyframes mmPop{ 50%{ transform:scale(1.05); } }
+#screen-home .mm-item[data-item="bin"][data-slot="c"]{ left:calc(var(--u)*54); top:calc(var(--u)*53); width:calc(var(--u)*332); height:calc(var(--u)*332); }
+#screen-home .mm-item[data-item="bin"][data-slot="l"]{ left:calc(var(--u)*-54); top:calc(var(--u)*22); width:calc(var(--u)*165); height:calc(var(--u)*165); }
+#screen-home .mm-item[data-item="bin"][data-slot="r"]{ left:calc(var(--u)*339); top:calc(var(--u)*23); width:calc(var(--u)*165); height:calc(var(--u)*165); }
+#screen-home .mm-item[data-item="truck"][data-slot="c"]{ left:calc(var(--u)*22); top:calc(var(--u)*40); width:calc(var(--u)*396); height:calc(var(--u)*367); }
+#screen-home .mm-item[data-item="truck"][data-slot="l"]{ left:calc(var(--u)*-67); top:calc(var(--u)*19); width:calc(var(--u)*188); height:calc(var(--u)*174); }
+#screen-home .mm-item[data-item="truck"][data-slot="r"]{ left:calc(var(--u)*301); top:calc(var(--u)*16); width:calc(var(--u)*188); height:calc(var(--u)*174); }
+#screen-home .mm-item[data-item="calendar"][data-slot="c"]{ left:calc(var(--u)*56); top:calc(var(--u)*57); width:calc(var(--u)*351); height:calc(var(--u)*351); }
+#screen-home .mm-item[data-item="calendar"][data-slot="l"]{ left:calc(var(--u)*-70); top:calc(var(--u)*34); width:calc(var(--u)*171); height:calc(var(--u)*171); }
+#screen-home .mm-item[data-item="calendar"][data-slot="r"]{ left:calc(var(--u)*339); top:calc(var(--u)*19); width:calc(var(--u)*171); height:calc(var(--u)*171); }
+#screen-home .mm-shadow[data-center="bin"]{ left:calc(var(--u)*117); top:calc(var(--u)*297); }
+#screen-home .mm-shadow[data-center="truck"]{ left:calc(var(--u)*121); top:calc(var(--u)*312); }
+#screen-home .mm-shadow[data-center="calendar"]{ left:calc(var(--u)*137); top:calc(var(--u)*298); }
+
+#screen-home .mm-copy{
+  position:absolute; left:calc(var(--u)*81); top:calc(var(--u)*378);
+  width:calc(var(--u)*291); height:calc(var(--u)*300);
+  transition:opacity .16s ease, transform .16s ease;
+}
+#screen-home .mm-copy.swap{ opacity:0; transform:translateY(calc(var(--u)*6)); }
+#screen-home .mm-title{
+  margin:0 0 calc(var(--u)*11); font-weight:600; font-size:calc(var(--u)*46); line-height:calc(var(--u)*52); color:#000;
+}
+#screen-home .mm-title.long{ font-size:calc(var(--u)*34); line-height:calc(var(--u)*40); }
+#screen-home .mm-text{
+  margin:0; font-weight:500; font-size:calc(var(--u)*22); line-height:calc(var(--u)*29.1); color:#000;
+}
+#screen-home .mm-cta{
+  position:absolute; left:calc(var(--u)*71); top:calc(var(--u)*687);
+  width:calc(var(--u)*298); height:calc(var(--u)*83);
+  border:0; padding:0; border-radius:999px; background:var(--mm-btn);
+  display:flex; align-items:center; justify-content:center; gap:calc(var(--u)*13);
+  font-family:'Fredoka', var(--font-body); font-weight:400; font-size:calc(var(--u)*30);
+  letter-spacing:.02em; color:#fff; cursor:pointer; z-index:4;
+  transition:transform .12s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+#screen-home .mm-cta:active{ transform:scale(.97); }
+#screen-home .mm-cta:focus-visible{ outline:3px solid #000; outline-offset:3px; }
+#screen-home .mm-cta svg{ width:calc(var(--u)*31); height:calc(var(--u)*23); display:block; }
+/* mint wash fading out right after the front-page slider burst, so the colour hands over smoothly */
+#screen-home.from-front::after{
+  content:""; position:absolute; inset:0; z-index:40; background:#61FF89; pointer-events:none;
+  animation:mmReveal .55s ease .05s forwards;
+}
+@keyframes mmReveal{ to{ opacity:0; } }
+@media (prefers-reduced-motion: reduce){
+  #screen-home .mm-item, #screen-home .mm-shadow, #screen-home .mm-copy{ transition-duration:.01s; }
+}
 </style>
 <style>
   :root{
@@ -2460,25 +2676,6 @@
 </style>
 </head>
 <body>
-<div id="intro" role="presentation" aria-label="TrashLift intro">
-  <div class="intro-red"></div>
-  <div class="intro-stage">
-    <div class="intro-mark">
-      <span class="intro-dot"></span>
-      <svg class="intro-truck" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="5" y="19" width="34" height="25" rx="3.5" fill="#111"/>
-        <path d="M41 26H51.5L60 35.5V44H41Z" fill="#111" stroke-linejoin="round"/>
-        <path d="M45 29.5H50L54.5 35H45Z" fill="#ffeb5b"/>
-        <circle cx="17" cy="46" r="6.5" fill="#111" stroke="#7cc644" stroke-width="3.2"/>
-        <circle cx="48" cy="46" r="6.5" fill="#111" stroke="#7cc644" stroke-width="3.2"/>
-        <circle cx="17" cy="46" r="2" fill="#ffeb5b"/>
-        <circle cx="48" cy="46" r="2" fill="#ffeb5b"/>
-      </svg>
-    </div>
-    <div class="intro-word" id="introWord" aria-label="TrashLift"></div>
-  </div>
-  <div class="intro-skip">Tap to skip</div>
-</div>
 <script>
 (function(){
   var intro = document.getElementById("intro");
@@ -2578,53 +2775,71 @@
   <main>
 
     <!-- HOME / MAIN MENU -->
-    <section class="screen active" id="screen-home">
-      <div class="home-yellow" aria-hidden="true"></div>
-      <div class="home-hero" aria-hidden="true">
-        <img class="home-heroBg" src="assets/hero_city.png" alt="">
+    <!-- FRONT PAGE — slide to get started (Figma: front page 1) -->
+    <section class="screen active" id="screen-front" aria-label="Welcome to TrashLift">
+      <div class="fp-brand">
+        <svg class="fp-logo-truck" viewBox="0 0 48 48" fill="none" stroke="#00A925" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="12" width="25" height="19" rx="2.5"/>
+          <path d="M28 18h8.5l7 7.5V31H28"/>
+          <circle cx="13" cy="33" r="4.2" fill="#fff"/>
+          <circle cx="36" cy="33" r="4.2" fill="#fff"/>
+        </svg>
+        <span class="fp-word">TRASHLIFT</span>
+        <svg class="fp-arrow" viewBox="0 0 120 13" fill="none" stroke="#00A925" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M0 6.5H116"/><path d="M110 1l6 5.5-6 5.5"/>
+        </svg>
       </div>
-      <h1 class="home-title">TrashLift</h1>
-
-      <div class="home-decor decor-bin" aria-hidden="true"><img src="assets/icon_bin.png" alt=""></div>
-      <div class="home-decor decor-phone" aria-hidden="true"><img src="assets/icon_phone.png" alt=""></div>
-      <div class="home-decor decor-map" aria-hidden="true"><img src="assets/icon_map.png" alt=""></div>
-
-      <div class="home-sparkles" aria-hidden="true">
-        <span class="hspark" style="left:8%; top:47%; width:9%;"><svg viewBox="0 0 26 26"><path d="M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z" fill="#FFBD59"/></svg></span>
-        <span class="hspark" style="right:6%; top:44%; width:13%;"><svg viewBox="0 0 26 26"><path d="M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z" fill="#FFBD59"/></svg></span>
-        <span class="hspark" style="right:14%; top:52%; width:7%;"><svg viewBox="0 0 26 26"><path d="M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z" fill="#FFBD59"/></svg></span>
-        <span class="hspark" style="left:12%; bottom:14%; width:8%;"><svg viewBox="0 0 26 26"><path d="M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z" fill="#FFBD59"/></svg></span>
-        <span class="hspark" style="right:10%; bottom:20%; width:10%;"><svg viewBox="0 0 26 26"><path d="M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z" fill="#FFBD59"/></svg></span>
+      <h1 class="fp-title">Smarter Collection for a Cleaner Community.</h1>
+      <div class="fp-art" aria-hidden="true">
+        <img class="fp-blob" src="assets/front_blob.png" alt="" draggable="false">
+        <img class="fp-garbage" src="assets/front_truck.png" alt="" draggable="false">
       </div>
-
-      <div class="home-menu">
-        <button class="menu-card to-right" id="roleWorkerBtn" data-auth-role="worker">
-          <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="5.5" width="12" height="10" rx="1.6"/><path d="M15 8.5h3.6L22.5 12.6V15.5H15z"/><path class="hole" d="M16.6 10h1.4l2.1 2.4h-3.5z"/><circle cx="6" cy="17.4" r="2.4"/><circle cx="17.6" cy="17.4" r="2.4"/><circle class="hole" cx="6" cy="17.4" r=".9"/><circle class="hole" cx="17.6" cy="17.4" r=".9"/></svg></span>
-          <span class="menu-title">Collect</span>
-        </button>
-
-        <button class="menu-card to-left" id="roleResidentBtn" data-auth-role="resident">
-          <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="2.2" rx="1"/><rect x="8.8" y="2.6" width="6.4" height="2.2" rx=".9"/><path d="M5.6 8.4h12.8l-1 11.6a2 2 0 0 1-2 1.8H8.6a2 2 0 0 1-2-1.8z"/><path d="M9.6 11v8M12 11v8M14.4 11v8" stroke="#FCFFFF" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg></span>
-          <span class="menu-title">Pick up</span>
-        </button>
-
-        <button class="menu-card to-right" data-screen="screen-schedule">
-          <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 1.8a7.7 7.7 0 0 0-7.7 7.7c0 5.6 7.7 12.7 7.7 12.7s7.7-7.1 7.7-12.7A7.7 7.7 0 0 0 12 1.8zm0 10.6a2.9 2.9 0 1 1 0-5.8 2.9 2.9 0 0 1 0 5.8z"/></svg></span>
-          <span class="menu-title small">Location &amp;<br>Schedules</span>
+      <div class="fp-slide" id="fpSlide">
+        <div class="fp-track" id="fpTrack"><span class="fp-label">Get Started</span></div>
+        <button type="button" class="fp-knob" id="fpKnob" role="slider" aria-label="Slide to get started" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <svg viewBox="0 0 34 29" fill="none" stroke="#00A925" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 3l28 11.5L3 26l5.5-11.5z"/></svg>
         </button>
       </div>
+      <div class="fp-burst" id="fpBurst" aria-hidden="true"></div>
+    </section>
 
-      <div class="home-footnote" id="team404" role="button" tabindex="0" title="Team 404">
-        <span class="fn-by">Made by</span>
-        <span class="fn-404">404</span>
+    <!-- MAIN SCREEN — 3-item carousel (Figma: Main screen 1/2/3). Replaces the old Collect / Pick up / Schedules buttons. -->
+    <section class="screen" id="screen-home" aria-label="TrashLift main screen">
+      <svg class="mm-banner" viewBox="0 0 440 176" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 L0 117.1 C1.8 118.0 7.3 120.7 10.9 122.6 C14.5 124.5 18.2 126.8 21.8 128.4 C25.4 130.0 29.1 131.4 32.7 132.4 C36.3 133.4 40.0 134.0 43.6 134.6 C47.2 135.2 50.9 135.6 54.5 136.0 C58.1 136.4 61.9 136.8 65.5 137.1 C69.2 137.3 72.8 137.4 76.4 137.5 C80.0 137.6 83.7 137.5 87.3 137.5 C90.9 137.5 94.6 137.5 98.2 137.5 C101.8 137.5 105.5 137.5 109.1 137.5 C112.7 137.5 116.4 137.3 120.0 137.5 C123.6 137.7 127.3 138.0 130.9 138.6 C134.5 139.2 138.2 140.0 141.8 140.8 C145.4 141.7 149.1 142.5 152.7 143.7 C156.3 144.9 160.0 146.6 163.6 148.0 C167.2 149.4 170.8 150.8 174.5 152.4 C178.2 154.0 181.8 155.7 185.5 157.5 C189.2 159.3 192.8 161.4 196.4 163.0 C200.0 164.6 203.7 166.1 207.3 167.3 C210.9 168.5 214.6 169.6 218.2 170.3 C221.8 171.0 225.5 171.4 229.1 171.7 C232.7 172.0 236.4 172.2 240.0 172.1 C243.6 172.0 247.3 171.6 250.9 171.0 C254.5 170.4 258.2 169.5 261.8 168.4 C265.4 167.3 269.1 165.9 272.7 164.4 C276.3 162.9 280.0 161.1 283.6 159.3 C287.2 157.6 290.9 155.7 294.5 153.9 C298.1 152.2 301.9 150.4 305.5 148.8 C309.1 147.2 312.8 145.7 316.4 144.4 C320.0 143.1 323.7 141.9 327.3 140.8 C330.9 139.7 334.6 138.7 338.2 137.8 C341.8 137.0 345.5 136.3 349.1 135.7 C352.7 135.1 356.4 134.7 360.0 134.2 C363.6 133.7 367.3 133.2 370.9 132.7 C374.5 132.1 378.2 131.6 381.8 130.9 C385.4 130.2 389.1 129.4 392.7 128.7 C396.3 128.0 400.0 127.4 403.6 126.6 C407.2 125.8 410.9 125.0 414.5 124.0 C418.1 123.0 421.9 121.6 425.5 120.4 C429.1 119.2 434.0 117.3 436.4 116.7 C438.8 116.1 439.4 116.7 440.0 116.7 L440 0 Z" fill="#06721D"/></svg>
+
+      <div class="mm-frame">
+        <div class="mm-brand" aria-hidden="true">
+          <svg class="mm-logo-truck" viewBox="1.5 10.5 43.5 28" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="12" width="25" height="19" rx="2.5"/>
+            <path d="M28 18h8.5l7 7.5V31H28"/>
+            <circle cx="13" cy="33" r="4.2" fill="#06721D"/>
+            <circle cx="36" cy="33" r="4.2" fill="#06721D"/>
+          </svg>
+          <span class="mm-word">TRASHLIFT</span>
+          <svg class="mm-arrow" viewBox="0 0 180 17" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 8.5H175"/><path d="M167 1.5l8 7-8 7"/>
+          </svg>
+        </div>
+
+        <div class="mm-lower" id="mmStage">
+          <div class="mm-card"></div>
+          <div class="mm-shadow" id="mmShadow" aria-hidden="true"></div>
+
+          <button type="button" class="mm-item" data-item="bin" aria-label="Pick up"><img src="assets/3d_trash_can.png" alt="" draggable="false"></button>
+          <button type="button" class="mm-item" data-item="truck" aria-label="Collector"><img src="assets/3d_truck.png" alt="" draggable="false"></button>
+          <button type="button" class="mm-item" data-item="calendar" aria-label="Trucks and schedules"><img src="assets/3d_calendar.png" alt="" draggable="false"></button>
+
+          <div class="mm-copy" id="mmCopy" aria-live="polite">
+            <h2 class="mm-title" id="mmTitle"></h2>
+            <p class="mm-text" id="mmText"></p>
+          </div>
+
+          <button type="button" class="mm-cta" id="mmContinue">
+            <span>CONTINUE</span>
+            <svg viewBox="0 0 33 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h28"/><path d="M20 2l11 10-11 10"/></svg>
+          </button>
+        </div>
       </div>
-
-      <div class="home-bushes" aria-hidden="true"><img src="assets/bottom_bushes_clean.png" alt=""></div>
-
-      <!-- Settings: placeholder for now, no action wired up yet -->
-      <button type="button" class="home-settings" id="homeSettingsBtn" aria-label="Settings — CO2 emissions avoided">
-        <span class="menu-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(0 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(45 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(90 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(135 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(180 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(225 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(270 12 12)"/><rect x="10" y="1.6" width="4" height="5" rx="1" transform="rotate(315 12 12)"/><circle cx="12" cy="12" r="7.4"/><circle class="hole" cx="12" cy="12" r="3.2"/></svg></span>
-      </button>
     </section>
 
     <!-- AUTH (login / sign up) — built on the Truck(06) mock -->
@@ -2926,40 +3141,205 @@
 (function(){
   "use strict";
 
-  var audioCtx = null;
-  function ensureAudio(){
-    if (audioCtx) return audioCtx;
-    var AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return null;
-    audioCtx = new AC();
-    return audioCtx;
-  }
-  function playTap(kind){
-    var ctx = ensureAudio();
-    if (!ctx) return;
-    if (ctx.state === "suspended") ctx.resume();
-    var t = ctx.currentTime;
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.type = kind === "pop" ? "sine" : "triangle";
-    var freq = kind === "pop" ? 560 : kind === "ok" ? 640 : 390;
-    osc.frequency.setValueAtTime(freq, t);
-    osc.frequency.exponentialRampToValueAtTime(Math.max(120, freq * 0.5), t + 0.08);
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(kind === "pop" ? 0.06 : 0.038, t + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.1);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.11);
-  }
+  /* SFX:BEGIN  all sounds are synthesized with Web Audio (no audio files to load) */
+  var SFX = (function(){
+    var ctx = null, bus = null, noiseBuf = null;
+
+    function makeBus(c){
+      var comp = c.createDynamicsCompressor();
+      comp.threshold.value = -14; comp.ratio.value = 6;
+      var g = c.createGain(); g.gain.value = 0.9;
+      g.connect(comp); comp.connect(c.destination);
+      return g;
+    }
+    function makeNoise(c){
+      var len = Math.floor(c.sampleRate * 1.5);
+      var b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      return b;
+    }
+    // oscillator blip: pitch glides f0 -> f1, fast attack, exponential decay
+    function blip(c, o, t, type, f0, f1, dur, peak, attack){
+      var osc = c.createOscillator(), g = c.createGain();
+      attack = attack || 0.005;
+      osc.type = type;
+      osc.frequency.setValueAtTime(f0, t);
+      if (f1 !== f0) osc.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(g); g.connect(o.out);
+      osc.start(t); osc.stop(t + dur + 0.02);
+    }
+    // filtered noise burst (whoosh / air brake / road)
+    function hiss(c, o, t, dur, ftype, f0, f1, q, peak, attack){
+      var src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = o.noise; src.loop = true;
+      f.type = ftype; f.Q.value = q;
+      f.frequency.setValueAtTime(f0, t);
+      if (f1 !== f0) f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(f); f.connect(g); g.connect(o.out);
+      src.start(t); src.stop(t + dur + 0.02);
+    }
+    // one truck horn blast (two notes)
+    function horn(c, o, t, dur, peak){
+      var lp = c.createBiquadFilter(), g = c.createGain();
+      lp.type = "lowpass"; lp.frequency.value = 1900;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + 0.025);
+      g.gain.setValueAtTime(peak, t + dur - 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.05);
+      [392, 494].forEach(function(f){
+        var osc = c.createOscillator();
+        osc.type = "sawtooth"; osc.frequency.value = f;
+        osc.connect(lp); osc.start(t); osc.stop(t + dur + 0.08);
+      });
+      lp.connect(g); g.connect(o.out);
+    }
+
+    var voices = {
+      // soft click for every button
+      tap: function(c, o, t){
+        blip(c, o, t, "sine", 620, 300, 0.085, 0.3, 0.004);
+        hiss(c, o, t, 0.02, "highpass", 3000, 3000, 0.7, 0.05, 0.002);
+      },
+      // bubbly pop (footnote / easter-egg buttons)
+      pop: function(c, o, t){ blip(c, o, t, "sine", 560, 1000, 0.1, 0.26, 0.006); },
+      // two-note "done" chime (submit / primary buttons)
+      ok: function(c, o, t){
+        blip(c, o, t, "triangle", 660, 660, 0.14, 0.22, 0.006);
+        blip(c, o, t + 0.075, "triangle", 990, 990, 0.2, 0.22, 0.006);
+        blip(c, o, t + 0.075, "sine", 1980, 1980, 0.15, 0.04, 0.006);
+      },
+      // slider notch while dragging (p = 0..1, pitch rises)
+      tick: function(c, o, t, p){
+        var f = 900 + (p || 0) * 800;
+        blip(c, o, t, "square", f, f, 0.022, 0.08, 0.002);
+      },
+      // slider springing back
+      thwip: function(c, o, t){ blip(c, o, t, "sine", 900, 320, 0.13, 0.16, 0.004); },
+      // slider reaching the end
+      latch: function(c, o, t){
+        blip(c, o, t, "sine", 220, 90, 0.14, 0.32, 0.004);
+        blip(c, o, t, "triangle", 1100, 1100, 0.06, 0.2, 0.003);
+      },
+      // the mint blob growing over the screen (0.7s), ends with a soft bloop + sparkle
+      burst: function(c, o, t){
+        hiss(c, o, t, 0.78, "bandpass", 250, 2600, 1.1, 0.2, 0.28);
+        blip(c, o, t, "sine", 180, 740, 0.7, 0.1, 0.35);
+        blip(c, o, t + 0.7, "sine", 560, 250, 0.17, 0.22, 0.006);
+        blip(c, o, t + 0.72, "triangle", 1568, 1568, 0.22, 0.06, 0.006);
+        blip(c, o, t + 0.79, "triangle", 2093, 2093, 0.25, 0.05, 0.006);
+      },
+      // beep-beep
+      honk: function(c, o, t){
+        horn(c, o, t, 0.22, 0.13);
+        horn(c, o, t + 0.3, 0.3, 0.13);
+      },
+      // garbage truck driving in (~1.7s), braking, then honking. Matches the drive-in animation.
+      truck: function(c, o, t){
+        var lp = c.createBiquadFilter(), chug = c.createGain(), eg = c.createGain();
+        var lfo = c.createOscillator(), lfoAmt = c.createGain();
+        lp.type = "lowpass"; lp.Q.value = 0.8;
+        lp.frequency.setValueAtTime(260, t);
+        lp.frequency.linearRampToValueAtTime(900, t + 1.1);
+        lp.frequency.linearRampToValueAtTime(320, t + 1.8);
+        chug.gain.value = 0.62;                       // engine "chug" = amplitude wobble
+        lfo.frequency.setValueAtTime(5, t);
+        lfo.frequency.linearRampToValueAtTime(10, t + 1.1);
+        lfo.frequency.linearRampToValueAtTime(6, t + 1.8);
+        lfoAmt.gain.value = 0.38;
+        lfo.connect(lfoAmt); lfoAmt.connect(chug.gain);
+        eg.gain.setValueAtTime(0.0001, t);
+        eg.gain.exponentialRampToValueAtTime(0.34, t + 1.0);
+        eg.gain.setValueAtTime(0.34, t + 1.25);
+        eg.gain.exponentialRampToValueAtTime(0.13, t + 1.9);
+        eg.gain.exponentialRampToValueAtTime(0.0001, t + 3.1);
+        [1, 1.027].forEach(function(m){
+          var osc = c.createOscillator();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(70 * m, t);
+          osc.frequency.linearRampToValueAtTime(110 * m, t + 1.1);
+          osc.frequency.linearRampToValueAtTime(78 * m, t + 1.8);
+          osc.connect(lp); osc.start(t); osc.stop(t + 3.2);
+        });
+        lfo.start(t); lfo.stop(t + 3.2);
+        lp.connect(chug); chug.connect(eg); eg.connect(o.out);
+        hiss(c, o, t + 0.05, 1.5, "lowpass", 500, 900, 0.7, 0.1, 0.8);        // tyres on the road
+        hiss(c, o, t + 1.3, 0.5, "highpass", 2800, 2800, 0.7, 0.2, 0.012);     // air brake "pssh"
+        blip(c, o, t + 1.45, "triangle", 220, 110, 0.12, 0.15, 0.004);          // suspension settles
+        voices.honk(c, o, t + 1.85);
+      }
+    };
+
+    function ensure(){
+      if (ctx) return ctx;
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      try { ctx = new AC(); } catch (e) { return null; }
+      bus = makeBus(ctx);
+      noiseBuf = makeNoise(ctx);
+      return ctx;
+    }
+    function voice(c, name, delay, arg){
+      try { voices[name](c, { out: bus, noise: noiseBuf }, c.currentTime + 0.01 + (delay || 0), arg); } catch (e) {}
+    }
+    // Play a sound from a tap/drag. If the browser still has audio suspended, it resumes inside the gesture.
+    function run(name, arg, delay){
+      if (document.hidden) return;
+      var c = ensure();
+      if (!c) return;
+      if (c.state === "running"){ voice(c, name, delay, arg); return; }
+      var asked = Date.now();
+      try {
+        var p = c.resume();
+        if (p && p.then) p.then(function(){ if (c.state === "running" && Date.now() - asked < 1500) voice(c, name, delay, arg); }, function(){});
+      } catch (e) {}
+    }
+    // Truck-arrives sound on page load. Browsers only allow sound on load for some visitors;
+    // if it is blocked, the truck honks on the first tap instead.
+    function startTruck(stillOnFront){
+      var c = ensure();
+      if (!c) return;
+      var started = false;
+      function go(){ if (started) return; started = true; voice(c, "truck", 0.02); }
+      if (c.state === "running"){ go(); return; }
+      try { c.resume(); } catch (e) {}
+      var tries = 0;
+      var iv = setInterval(function(){
+        tries++;
+        if (c.state === "running"){ clearInterval(iv); go(); }
+        else if (tries >= 8){ clearInterval(iv); greetOnFirstTap(c, stillOnFront); }
+      }, 60);
+    }
+    function greetOnFirstTap(c, stillOnFront){
+      var evs = ["pointerdown", "keydown", "touchend"], fired = false;
+      function onGesture(){
+        if (fired) return;
+        fired = true;
+        evs.forEach(function(n){ document.removeEventListener(n, onGesture, true); });
+        try { c.resume(); } catch (e) {}
+        setTimeout(function(){
+          if (c.state === "running" && (!stillOnFront || stillOnFront())) voice(c, "honk", 0);
+        }, 170);
+      }
+      evs.forEach(function(n){ document.addEventListener(n, onGesture, true); });
+    }
+    return { run: run, startTruck: startTruck, voices: voices };
+  })();
+  /* SFX:END */
+
+  // every button gets a click; submit/primary buttons get the "done" chime
   document.addEventListener("pointerdown", function(e){
-    var el = e.target.closest("button, .menu-card, .chip, a.maps-ext-btn, .home-footnote, .account-fab");
+    var el = e.target.closest("button, [role=\"button\"], .menu-card, .chip, a.maps-ext-btn, .home-footnote, .account-fab");
     if (!el || el.disabled) return;
     var kind = "tap";
     if (el.id === "team404" || el.classList.contains("home-footnote")) kind = "pop";
     else if (el.classList.contains("submit-btn") || el.classList.contains("auth-submit") || (el.classList.contains("primary") && el.tagName === "BUTTON")) kind = "ok";
-    playTap(kind);
+    SFX.run(kind);
   }, true);
 
   var USER_KEY = "trashlift-user-v1";
@@ -4688,10 +5068,11 @@
   function roleHomeScreen(){
     if (state.user && state.user.role === "worker") return "screen-collector";
     if (state.user && state.user.role === "resident") return "screen-request";
-    return "screen-home";
+    return state.frontDone ? "screen-home" : "screen-front";
   }
 
   function canAccess(screenId){
+    if (screenId === "screen-front") return !state.user && !state.frontDone;
     if (screenId === "screen-home") return !state.user;
     if (screenId === "screen-schedule" || screenId === "screen-co2") return true;
     if (screenId === "screen-auth") return !state.user || !!state.pendingRole;
@@ -4721,6 +5102,7 @@
     });
     var shellEl = document.querySelector(".shell");
     if (shellEl){
+      shellEl.classList.toggle("is-front", screenId === "screen-front");
       shellEl.classList.toggle("is-home", screenId === "screen-home");
       shellEl.classList.toggle("is-auth", screenId === "screen-auth");
       shellEl.classList.toggle("is-request", screenId === "screen-request");
@@ -4828,8 +5210,225 @@
   }
 
   // ---------- init ----------
+  // ---------- front page: slide to get started ----------
+  // Figma: the track shrinks from the left as you drag (frames 1-4), then the knob bursts into a circle (5-9).
+  function initFront(){
+    var root = document.documentElement;
+    var screen = document.getElementById("screen-front");
+    var slide = document.getElementById("fpSlide");
+    var knob = document.getElementById("fpKnob");
+    var burst = document.getElementById("fpBurst");
+    if (!screen || !slide || !knob || !burst) return;
+    var maxX = 0, u = 1, x = 0, startX = 0;
+    var dragging = false, done = false, touched = false, timers = [], lastStep = 0;
+
+    function measure(){
+      if (!slide.clientWidth) return;
+      u = slide.clientWidth / 390;            // 1 Figma px
+      maxX = 291 * u;                         // knob travel: x34 -> x325 in the design
+    }
+    function paint(v, animate){
+      x = Math.max(0, Math.min(maxX, v));
+      var p = maxX ? x / maxX : 0;
+      slide.classList.toggle("snap", !!animate);
+      slide.style.setProperty("--p", p.toFixed(3));
+      slide.style.setProperty("--x", x + "px");
+      // track's left edge follows the knob; side padding eases 9 -> 17 so it ends at the 107px pill
+      slide.style.setProperty("--tl", (x - 8 * u * p).toFixed(2) + "px");
+      knob.setAttribute("aria-valuenow", String(Math.round(p * 100)));
+    }
+    function stopNudge(){ touched = true; timers.forEach(clearTimeout); timers = []; }
+    function nudge(){
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      [1300, 3200].forEach(function(t){
+        timers.push(setTimeout(function(){
+          if (dragging || done || touched) return;
+          measure(); paint(maxX * 0.12, true);
+          timers.push(setTimeout(function(){ if (!dragging && !done && !touched) paint(0, true); }, 420));
+        }, t));
+      });
+    }
+
+    function runBurst(){
+      SFX.run("burst");                       // the mint blob growing over the screen
+      var sr = screen.getBoundingClientRect(), kr = knob.getBoundingClientRect();
+      var cx = kr.left + kr.width / 2 - sr.left, cy = kr.top + kr.height / 2 - sr.top;
+      var R = Math.hypot(Math.max(cx, sr.width - cx), Math.max(cy, sr.height - cy)) + 6;
+      screen.classList.add("bursting");
+      burst.style.transition = "none";
+      burst.style.clipPath = "circle(" + (kr.width / 2) + "px at " + cx + "px " + cy + "px)";
+      burst.style.visibility = "visible";
+      void burst.offsetWidth;
+      burst.style.transition = "clip-path .7s cubic-bezier(.55,0,.25,1)";
+      burst.style.clipPath = "circle(" + R + "px at " + cx + "px " + cy + "px)";
+      setTimeout(finish, 760);
+    }
+    function finish(){
+      state.frontDone = true;
+      root.classList.add("intro-done");        // start the home screen's entrance animations
+      var hs = document.getElementById("screen-home");
+      if (hs){ hs.classList.add("from-front"); setTimeout(function(){ hs.classList.remove("from-front"); }, 800); }
+      goToScreen("screen-home");
+      burst.style.transition = "none";
+      burst.style.visibility = "hidden";
+      burst.style.clipPath = "circle(0px at 50% 50%)";
+      screen.classList.remove("bursting");
+      done = false;
+      paint(0, false);
+    }
+    function complete(){
+      if (done) return;
+      done = true; stopNudge(); measure();
+      paint(maxX, true);
+      SFX.run("latch");
+      setTimeout(runBurst, 260);
+    }
+
+    knob.addEventListener("pointerdown", function(e){
+      if (done) return;
+      stopNudge(); measure();
+      dragging = true;
+      lastStep = 0;
+      startX = e.clientX - x;
+      try { knob.setPointerCapture(e.pointerId); } catch(err){}
+      paint(x, false);
+    });
+    knob.addEventListener("pointermove", function(e){
+      if (!dragging) return;
+      paint(e.clientX - startX, false);
+      var p = maxX ? x / maxX : 0, step = Math.floor(p * 10);
+      if (step !== lastStep){ lastStep = step; if (step > 0) SFX.run("tick", p); }   // notch sounds while dragging
+    });
+    function release(){
+      if (!dragging) return;
+      dragging = false;
+      if (maxX && x >= maxX * 0.78) complete();
+      else { if (x > maxX * 0.1) SFX.run("thwip"); paint(0, true); }   // spring back
+    }
+    knob.addEventListener("pointerup", release);
+    knob.addEventListener("pointercancel", release);
+    knob.addEventListener("keydown", function(e){
+      if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight"){ e.preventDefault(); complete(); }
+    });
+    window.addEventListener("resize", function(){ if (!slide.clientWidth) return; measure(); if (!done) paint(0, false); });
+    measure();
+    if (state.user) root.classList.add("intro-done"); else nudge();
+
+    // the truck drives in from the right edge, with its engine, brakes and horn
+    var truckImg = screen.querySelector(".fp-garbage"), truckStarted = false;
+    function driveIn(){
+      if (truckStarted) return;
+      truckStarted = true;
+      screen.classList.add("truck-go");
+      var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!state.user && !calm) SFX.startTruck(function(){ return !state.frontDone; });
+    }
+    if (truckImg && !truckImg.complete){
+      truckImg.addEventListener("load", driveIn, { once: true });
+      truckImg.addEventListener("error", driveIn, { once: true });
+      setTimeout(driveIn, 1500);                // never leave the truck hidden
+    } else driveIn();
+  }
+
+  // ---------- main screen: 3-item carousel (Pick up / Collector / Trucks Schedules) ----------
+  function initMainScreen(){
+    var scr = document.getElementById("screen-home");
+    var stage = document.getElementById("mmStage");
+    if (!scr || !stage) return;
+    var items = [].slice.call(scr.querySelectorAll(".mm-item"));
+    var copy = document.getElementById("mmCopy");
+    var titleEl = document.getElementById("mmTitle");
+    var textEl = document.getElementById("mmText");
+    var shadow = document.getElementById("mmShadow");
+    var cta = document.getElementById("mmContinue");
+    var ORDER = ["bin", "truck", "calendar"];
+    var DATA = {
+      bin:      { title: "Pick up :",
+                  text: "Drop a pin on the map or use your exact location, take a live photo that the AI checks, choose the trash type and add a note. Then send it to the collectors.",
+                  role: "resident" },
+      truck:    { title: "Collector :",
+                  text: "Collectors get a list of resident requests with the photo, trash type, note and location. They take a job, collect the trash and mark it done. And know where the truck is and when it\u2019s coming.",
+                  role: "worker" },
+      calendar: { title: "Trucks Schedules :",
+                  text: "Follow the truck live with an estimated arrival time, and check the regular collection days and times for your barangay.",
+                  screen: "screen-schedule" }
+    };
+    var idx = 0, swipe = null, moved = false, swapTimer = null;
+
+    function render(first){
+      var key = ORDER[idx];
+      items.forEach(function(el){
+        var i = ORDER.indexOf(el.dataset.item);
+        var slot = ["c", "r", "l"][(i - idx + 3) % 3];
+        el.dataset.slot = slot;
+        el.setAttribute("aria-current", slot === "c" ? "true" : "false");
+      });
+      shadow.dataset.center = key;
+      function setCopy(){
+        titleEl.textContent = DATA[key].title; textEl.textContent = DATA[key].text;
+        titleEl.classList.toggle("long", DATA[key].title.length > 13);
+      }
+      if (first){ setCopy(); return; }
+      clearTimeout(swapTimer);
+      copy.classList.add("swap");
+      swapTimer = setTimeout(function(){ setCopy(); copy.classList.remove("swap"); }, 160);
+    }
+    function go(delta){ idx = (idx + delta + 3) % 3; render(false); }
+    function select(i){
+      var d = (i - idx + 3) % 3;
+      if (d === 1) go(1); else if (d === 2) go(-1);
+    }
+
+    items.forEach(function(el){
+      el.addEventListener("click", function(){
+        if (moved) { moved = false; return; }
+        var i = ORDER.indexOf(el.dataset.item);
+        if (i === idx){
+          el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+        } else select(i);
+      });
+    });
+
+    // swipe / drag left-right anywhere on the stage
+    scr.addEventListener("pointerdown", function(e){
+      if (e.target.closest && e.target.closest(".mm-cta")) return;
+      swipe = { x: e.clientX, y: e.clientY }; moved = false;
+    });
+    scr.addEventListener("pointermove", function(e){
+      if (!swipe) return;
+      if (Math.abs(e.clientX - swipe.x) > 12) moved = true;
+    });
+    function endSwipe(e){
+      if (!swipe) return;
+      var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+      swipe = null;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)){ moved = true; go(dx < 0 ? 1 : -1); }
+      else moved = false;
+    }
+    scr.addEventListener("pointerup", endSwipe);
+    scr.addEventListener("pointercancel", function(){ swipe = null; moved = false; });
+    scr.addEventListener("keydown", function(e){
+      if (e.key === "ArrowRight"){ e.preventDefault(); go(1); }
+      else if (e.key === "ArrowLeft"){ e.preventDefault(); go(-1); }
+    });
+
+    cta.addEventListener("click", function(){
+      var d = DATA[ORDER[idx]];
+      if (d.role){
+        if (state.user && state.user.role === d.role) goToScreen(d.role === "worker" ? "screen-collector" : "screen-request");
+        else openAuth(d.role);                    // same flow the old Collect / Pick up buttons used
+      } else {
+        goToScreen(d.screen);
+      }
+    });
+
+    render(true);
+  }
+
   function init(){
     loadUser();
+    initFront();
+    initMainScreen();
     initMap();
     initLocateBtn();
     buildChips();
