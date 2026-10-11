@@ -129,8 +129,8 @@
 #screen-home{
   container-type:size;
   --u: min(calc(100cqw / 440), calc(100cqh / 956));   /* 1 Figma px — fits the design to the screen */
-  --mm-bg:#61FF89; --mm-dark:#06721D; --mm-btn:#00A925;
-  background:var(--mm-bg);
+  --mm-bg:#61FF89; --mm-dark:#06721D; --mm-btn:#00D92F;
+  background:linear-gradient(to top right, #6BFD87 0%, #92FB77 45%, #B2F969 100%);
   overflow:hidden;
   animation:none;
   font-family:'Fredoka', var(--font-body);
@@ -138,31 +138,34 @@
   touch-action:pan-y;
 }
 #screen-home .mm-banner{
-  position:absolute; left:0; top:0; width:100%; height:calc(var(--u)*176);
-  display:block; pointer-events:none;
+  position:absolute; left:0; top:0; width:100%; height:calc(var(--u)*163);
+  display:block; pointer-events:none; object-fit:fill; z-index:0;
 }
 #screen-home .mm-frame{
   position:absolute; top:0; left:50%;
   width:calc(var(--u)*440); height:calc(var(--u)*956);
   transform:translateX(-50%);
 }
+#screen-home .mm-leaf{ position:absolute; bottom:0; display:block; pointer-events:none; z-index:0; }
+#screen-home .mm-leaf-l{ left:0; width:calc(var(--u)*65); height:calc(var(--u)*171); }
+#screen-home .mm-leaf-r{ right:0; width:calc(var(--u)*82); height:calc(var(--u)*186); }
 #screen-home .mm-brand{ position:absolute; left:0; top:0; width:100%; height:calc(var(--u)*120); pointer-events:none; }
-#screen-home .mm-logo-truck{ position:absolute; left:calc(var(--u)*82); top:calc(var(--u)*55); width:calc(var(--u)*88.7); height:calc(var(--u)*58); }
+#screen-home .mm-logo-truck{ position:absolute; left:calc(var(--u)*82); top:calc(var(--u)*17); width:calc(var(--u)*88.7); height:calc(var(--u)*58); }
 #screen-home .mm-word{
-  position:absolute; left:calc(var(--u)*172.7); top:calc(var(--u)*22);
+  position:absolute; left:calc(var(--u)*172.7); top:calc(var(--u)*0);
   font-family:'Cherry Bomb One','Fredoka',var(--font-body);
   font-size:calc(var(--u)*32); line-height:calc(var(--u)*90.6);
   color:#FFFFFF; white-space:nowrap;
 }
-#screen-home .mm-arrow{ position:absolute; left:calc(var(--u)*175.8); top:calc(var(--u)*83.4); width:calc(var(--u)*179); height:calc(var(--u)*17); overflow:visible; }
+#screen-home .mm-arrow{ position:absolute; left:calc(var(--u)*175.8); top:calc(var(--u)*52); width:calc(var(--u)*179); height:calc(var(--u)*17); overflow:visible; }
 
 #screen-home .mm-lower{
   position:absolute; left:0; right:0; bottom:0;
   height:calc(var(--u)*820);            /* design y 136 -> 956 */
 }
 #screen-home .mm-card{
-  position:absolute; left:calc(var(--u)*45); top:calc(var(--u)*316);
-  width:calc(var(--u)*350); height:calc(var(--u)*471);
+  position:absolute; left:calc(var(--u)*22); top:calc(var(--u)*316);
+  width:calc(var(--u)*396); height:calc(var(--u)*450);
   background:#FFFFFF; border-radius:calc(var(--u)*46);
 }
 #screen-home .mm-shadow{
@@ -175,7 +178,7 @@
   position:absolute; z-index:2; padding:0; margin:0; border:0; background:none;
   cursor:pointer; -webkit-tap-highlight-color:transparent;
   transition:left .5s cubic-bezier(.3,.8,.2,1), top .5s cubic-bezier(.3,.8,.2,1),
-             width .5s cubic-bezier(.3,.8,.2,1), height .5s cubic-bezier(.3,.8,.2,1);
+             width .5s cubic-bezier(.3,.8,.2,1), height .5s cubic-bezier(.3,.8,.2,1), opacity .3s ease;
 }
 #screen-home .mm-item[data-slot="c"]{ z-index:3; cursor:default; }
 #screen-home .mm-item img{ width:100%; height:100%; object-fit:contain; display:block; pointer-events:none; }
@@ -193,24 +196,69 @@
 #screen-home .mm-item[data-item="calendar"][data-slot="r"]{ left:calc(var(--u)*339); top:calc(var(--u)*19); width:calc(var(--u)*171); height:calc(var(--u)*171); }
 #screen-home .mm-shadow[data-center="bin"]{ left:calc(var(--u)*117); top:calc(var(--u)*297); }
 #screen-home .mm-shadow[data-center="truck"]{ left:calc(var(--u)*121); top:calc(var(--u)*312); }
+#screen-home .mm-item[data-item="stats"][data-slot="c"]{ left:calc(var(--u)*65); top:calc(var(--u)*55); width:calc(var(--u)*310); height:calc(var(--u)*310); }
+#screen-home .mm-item[data-item="stats"][data-slot="l"]{ left:calc(var(--u)*-54); top:calc(var(--u)*22); width:calc(var(--u)*165); height:calc(var(--u)*165); }
+#screen-home .mm-item[data-item="stats"][data-slot="r"]{ left:calc(var(--u)*339); top:calc(var(--u)*23); width:calc(var(--u)*165); height:calc(var(--u)*165); }
+#screen-home .mm-item[data-slot="h"]{ left:calc(var(--u)*190); top:calc(var(--u)*90); width:calc(var(--u)*60); height:calc(var(--u)*60); opacity:0; pointer-events:none; z-index:0; }
+#screen-home .mm-shadow[data-center="stats"]{ left:calc(var(--u)*120); top:calc(var(--u)*290); }
 #screen-home .mm-shadow[data-center="calendar"]{ left:calc(var(--u)*137); top:calc(var(--u)*298); }
 
+#screen-home .mm-dots{
+  position:absolute; left:0; right:0; top:calc(var(--u)*100); height:calc(var(--u)*18);
+  display:flex; align-items:center; justify-content:center; gap:calc(var(--u)*22.5); z-index:5;
+}
+#screen-home .mm-dot{
+  box-sizing:border-box; padding:0; margin:0; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  width:calc(var(--u)*15); height:calc(var(--u)*15); border-radius:50%;
+  background:rgba(143,253,167,.55); border:calc(var(--u)*2) solid #fff;
+  transition:width .25s ease, height .25s ease, background-color .25s ease, border-color .25s ease;
+}
+#screen-home .mm-dot.on{ width:calc(var(--u)*18); height:calc(var(--u)*18); background:#fff; border-color:#fff; }
+#screen-home .mm-dot:focus-visible{ outline:3px solid #000; outline-offset:3px; }
+
 #screen-home .mm-copy{
-  position:absolute; left:calc(var(--u)*81); top:calc(var(--u)*378);
-  width:calc(var(--u)*291); height:calc(var(--u)*300);
+  position:absolute; left:calc(var(--u)*46); top:calc(var(--u)*362);
+  width:calc(var(--u)*348); height:calc(var(--u)*310);
+  display:flex; flex-direction:column; color:#00A925;
   transition:opacity .16s ease, transform .16s ease;
 }
 #screen-home .mm-copy.swap{ opacity:0; transform:translateY(calc(var(--u)*6)); }
 #screen-home .mm-title{
-  margin:0 0 calc(var(--u)*11); font-weight:600; font-size:calc(var(--u)*46); line-height:calc(var(--u)*52); color:#000;
+  margin:0; font-weight:600; font-size:calc(var(--u)*46); line-height:calc(var(--u)*50); color:#00A925;
+  text-align:center; letter-spacing:.01em;
 }
-#screen-home .mm-title.long{ font-size:calc(var(--u)*34); line-height:calc(var(--u)*40); }
+#screen-home .mm-title.long{ font-size:calc(var(--u)*40); line-height:calc(var(--u)*46); text-align:center; padding:0; }
+#screen-home .mm-title.nosub{ margin-bottom:calc(var(--u)*22); }
+#screen-home .mm-title.nosub.long{ margin-bottom:calc(var(--u)*16); }
+#screen-home .mm-sub{
+  text-align:center; font-weight:500; font-size:calc(var(--u)*18); line-height:calc(var(--u)*22); color:#00A925;
+  margin:calc(var(--u)*2) 0 calc(var(--u)*8);
+}
+#screen-home .mm-sub:empty{ display:none; }
 #screen-home .mm-text{
-  margin:0; font-weight:500; font-size:calc(var(--u)*22); line-height:calc(var(--u)*29.1); color:#000;
+  margin:0 0 calc(var(--u)*8); font-weight:500; font-size:calc(var(--u)*16.5); line-height:calc(var(--u)*21); color:#00A925;
+  padding:0 calc(var(--u)*8);
 }
+#screen-home .mm-text:empty{ display:none; }
+#screen-home .mm-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; }
+#screen-home .mm-li{
+  display:flex; align-items:center; gap:calc(var(--u)*14);
+  padding:0 calc(var(--u)*8); margin-bottom:calc(var(--u)*12);
+}
+#screen-home .mm-list.roomy .mm-li{ margin-bottom:calc(var(--u)*20); }
+#screen-home .mm-ico{
+  flex:none; width:calc(var(--u)*50); height:calc(var(--u)*50); border-radius:50%;
+  background:#8FFDA7; display:flex; align-items:center; justify-content:center;
+}
+#screen-home .mm-li:nth-child(even) .mm-ico{ background:#7FEB96; }
+#screen-home .mm-ico svg{
+  width:calc(var(--u)*28); height:calc(var(--u)*28); display:block;
+  fill:none; stroke:#0E7A25; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round;
+}
+#screen-home .mm-li span{ font-weight:500; font-size:calc(var(--u)*17); line-height:calc(var(--u)*22); color:#00A925; }
 #screen-home .mm-cta{
-  position:absolute; left:calc(var(--u)*71); top:calc(var(--u)*687);
-  width:calc(var(--u)*298); height:calc(var(--u)*83);
+  position:absolute; left:calc(var(--u)*46); top:calc(var(--u)*667);
+  width:calc(var(--u)*348); height:calc(var(--u)*83);
   border:0; padding:0; border-radius:999px; background:var(--mm-btn);
   display:flex; align-items:center; justify-content:center; gap:calc(var(--u)*13);
   font-family:'Fredoka', var(--font-body); font-weight:400; font-size:calc(var(--u)*30);
@@ -2805,20 +2853,29 @@
 
     <!-- MAIN SCREEN — 3-item carousel (Figma: Main screen 1/2/3). Replaces the old Collect / Pick up / Schedules buttons. -->
     <section class="screen" id="screen-home" aria-label="TrashLift main screen">
-      <svg class="mm-banner" viewBox="0 0 440 176" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 L0 117.1 C1.8 118.0 7.3 120.7 10.9 122.6 C14.5 124.5 18.2 126.8 21.8 128.4 C25.4 130.0 29.1 131.4 32.7 132.4 C36.3 133.4 40.0 134.0 43.6 134.6 C47.2 135.2 50.9 135.6 54.5 136.0 C58.1 136.4 61.9 136.8 65.5 137.1 C69.2 137.3 72.8 137.4 76.4 137.5 C80.0 137.6 83.7 137.5 87.3 137.5 C90.9 137.5 94.6 137.5 98.2 137.5 C101.8 137.5 105.5 137.5 109.1 137.5 C112.7 137.5 116.4 137.3 120.0 137.5 C123.6 137.7 127.3 138.0 130.9 138.6 C134.5 139.2 138.2 140.0 141.8 140.8 C145.4 141.7 149.1 142.5 152.7 143.7 C156.3 144.9 160.0 146.6 163.6 148.0 C167.2 149.4 170.8 150.8 174.5 152.4 C178.2 154.0 181.8 155.7 185.5 157.5 C189.2 159.3 192.8 161.4 196.4 163.0 C200.0 164.6 203.7 166.1 207.3 167.3 C210.9 168.5 214.6 169.6 218.2 170.3 C221.8 171.0 225.5 171.4 229.1 171.7 C232.7 172.0 236.4 172.2 240.0 172.1 C243.6 172.0 247.3 171.6 250.9 171.0 C254.5 170.4 258.2 169.5 261.8 168.4 C265.4 167.3 269.1 165.9 272.7 164.4 C276.3 162.9 280.0 161.1 283.6 159.3 C287.2 157.6 290.9 155.7 294.5 153.9 C298.1 152.2 301.9 150.4 305.5 148.8 C309.1 147.2 312.8 145.7 316.4 144.4 C320.0 143.1 323.7 141.9 327.3 140.8 C330.9 139.7 334.6 138.7 338.2 137.8 C341.8 137.0 345.5 136.3 349.1 135.7 C352.7 135.1 356.4 134.7 360.0 134.2 C363.6 133.7 367.3 133.2 370.9 132.7 C374.5 132.1 378.2 131.6 381.8 130.9 C385.4 130.2 389.1 129.4 392.7 128.7 C396.3 128.0 400.0 127.4 403.6 126.6 C407.2 125.8 410.9 125.0 414.5 124.0 C418.1 123.0 421.9 121.6 425.5 120.4 C429.1 119.2 434.0 117.3 436.4 116.7 C438.8 116.1 439.4 116.7 440.0 116.7 L440 0 Z" fill="#06721D"/></svg>
+      <img class="mm-banner" src="assets/mm_header.png" alt="" aria-hidden="true" draggable="false">
+<img class="mm-leaf mm-leaf-l" src="assets/mm_leaf_l.png" alt="" aria-hidden="true" draggable="false">
+<img class="mm-leaf mm-leaf-r" src="assets/mm_leaf_r.png" alt="" aria-hidden="true" draggable="false">
 
       <div class="mm-frame">
         <div class="mm-brand" aria-hidden="true">
           <svg class="mm-logo-truck" viewBox="1.5 10.5 43.5 28" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="12" width="25" height="19" rx="2.5"/>
             <path d="M28 18h8.5l7 7.5V31H28"/>
-            <circle cx="13" cy="33" r="4.2" fill="#06721D"/>
-            <circle cx="36" cy="33" r="4.2" fill="#06721D"/>
+            <circle cx="13" cy="33" r="4.2" fill="#3BCB62"/>
+            <circle cx="36" cy="33" r="4.2" fill="#3BCB62"/>
           </svg>
           <span class="mm-word">TRASHLIFT</span>
           <svg class="mm-arrow" viewBox="0 0 180 17" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M1 8.5H175"/><path d="M167 1.5l8 7-8 7"/>
           </svg>
+        </div>
+
+        <div class="mm-dots" id="mmDots" role="tablist" aria-label="Main screen pages">
+          <button type="button" class="mm-dot" data-i="0" role="tab" aria-label="Pick up"></button>
+          <button type="button" class="mm-dot" data-i="1" role="tab" aria-label="Collect"></button>
+          <button type="button" class="mm-dot" data-i="2" role="tab" aria-label="Collection schedule"></button>
+          <button type="button" class="mm-dot" data-i="3" role="tab" aria-label="Statistics"></button>
         </div>
 
         <div class="mm-lower" id="mmStage">
@@ -2828,10 +2885,13 @@
           <button type="button" class="mm-item" data-item="bin" aria-label="Pick up"><img src="assets/3d_trash_can.png" alt="" draggable="false"></button>
           <button type="button" class="mm-item" data-item="truck" aria-label="Collector"><img src="assets/3d_truck.png" alt="" draggable="false"></button>
           <button type="button" class="mm-item" data-item="calendar" aria-label="Trucks and schedules"><img src="assets/3d_calendar.png" alt="" draggable="false"></button>
+          <button type="button" class="mm-item" data-item="stats" aria-label="Statistics"><img src="assets/3d_stats.png" alt="" draggable="false"></button>
 
           <div class="mm-copy" id="mmCopy" aria-live="polite">
             <h2 class="mm-title" id="mmTitle"></h2>
+            <div class="mm-sub" id="mmSub"></div>
             <p class="mm-text" id="mmText"></p>
+            <ul class="mm-list" id="mmList"></ul>
           </div>
 
           <button type="button" class="mm-cta" id="mmContinue">
@@ -5339,44 +5399,87 @@
     var copy = document.getElementById("mmCopy");
     var titleEl = document.getElementById("mmTitle");
     var textEl = document.getElementById("mmText");
+    var subEl = document.getElementById("mmSub");
+    var listEl = document.getElementById("mmList");
+    var dots = [].slice.call(scr.querySelectorAll(".mm-dot"));
     var shadow = document.getElementById("mmShadow");
     var cta = document.getElementById("mmContinue");
-    var ORDER = ["bin", "truck", "calendar"];
-    var DATA = {
-      bin:      { title: "Pick up :",
-                  text: "Drop a pin on the map or use your exact location, take a live photo that the AI checks, choose the trash type and add a note. Then send it to the collectors.",
-                  role: "resident" },
-      truck:    { title: "Collector :",
-                  text: "Collectors get a list of resident requests with the photo, trash type, note and location. They take a job, collect the trash and mark it done. And know where the truck is and when it\u2019s coming.",
-                  role: "worker" },
-      calendar: { title: "Trucks Schedules :",
-                  text: "Follow the truck live with an estimated arrival time, and check the regular collection days and times for your barangay.",
-                  screen: "screen-schedule" }
+    var ORDER = ["bin", "truck", "calendar", "stats"];
+var ICO = {
+      pin:   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.6"/></svg>',
+      cam:   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.3-2h6l1.3 2h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg>',
+      bin:   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16"/><path d="M9.5 6.5V4.5h5v2"/><path d="M6.2 6.5l.9 13h9.8l.9-13"/><path d="M10 10.5v6M14 10.5v6"/></svg>',
+      check: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="M8 12.4l2.8 2.8L16.2 9.6"/></svg>',
+      clock: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="M12 7v5.4h4"/></svg>',
+      cal:   '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2"/><path d="M4 10h16M8.5 3.5v3.5M15.5 3.5v3.5"/><path d="M8.5 13.5h.01M12 13.5h.01M15.5 13.5h.01M8.5 16.5h.01M12 16.5h.01" stroke-width="2.2"/></svg>',
+      truck: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h10.5v9H3z"/><path d="M13.5 9.5h4l3 3.2v2.8h-7"/><circle cx="7" cy="17.3" r="1.9"/><circle cx="16.6" cy="17.3" r="1.9"/></svg>',
+      clip:  '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="4.5" width="13" height="16" rx="2"/><path d="M9.5 4.5V3.2h5v1.3"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>',
+      clip:  '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="4.5" width="13" height="16" rx="2"/><path d="M9.5 4.5v-1h5v1"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>',
+      truck: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.8" y="6.5" width="11" height="9" rx="1.4"/><path d="M13.8 9.5h4l3 3.4v2.6h-7"/><circle cx="7" cy="17" r="1.9"/><circle cx="17" cy="17" r="1.9"/></svg>',
+      line:  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.5v15h16"/><path d="M7.5 15l3.5-4.5 3 2.5 4.5-6"/></svg>',
+      pie:   '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6"/><path d="M12 12V3.4"/><path d="M12 12l6.1 6.1"/><path d="M12 12H3.4"/></svg>',
+      chart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5h16"/><rect x="5" y="13" width="3.6" height="6.5"/><rect x="10.2" y="8.5" width="3.6" height="11"/><rect x="15.4" y="4.5" width="3.6" height="15"/></svg>'
     };
+    var DATA = {
+      bin:      { title: "PICK UP", sub: "(For Residence)", text: "",
+                  items: [["pin", "Drop a pin on the map or use your exact location."],
+                          ["cam", "Take a live photo that the AI checks."],
+                          ["bin", "Choose the trash type and add a note. Then send it to the collectors."]],
+                  role: "resident" },
+      truck:    { title: "COLLECT", sub: "(For Workers)", text: "",
+                  items: [["clip", "Accepts request from the residences."],
+                          ["pin", "See request details in one place."],
+                          ["check", "Keep track of progress and mark as done."]],
+                  role: "worker" },
+      calendar: { title: "COLLECTION SCHEDULE", sub: "", text: "",
+                  items: [["truck", "See the nearest truck in your area."],
+                          ["clock", "View real-time truck location & ETA."],
+                          ["cal", "See collection days and times."]],
+                  screen: "screen-schedule" },
+      stats:    { title: "STATISTICS", sub: "", text: "", roomy: true,
+                  items: [["chart", "Environmental Impact Stat"],
+                          ["line", "Personal Convenience Stats"],
+                          ["pie", "Community Leaderboard Stats"]],
+                  screen: "screen-co2" }
+    };
+    var N = ORDER.length;
     var idx = 0, swipe = null, moved = false, swapTimer = null;
 
     function render(first){
       var key = ORDER[idx];
       items.forEach(function(el){
         var i = ORDER.indexOf(el.dataset.item);
-        var slot = ["c", "r", "l"][(i - idx + 3) % 3];
+        var slot = ["c", "r", "h", "l"][(i - idx + N) % N];
         el.dataset.slot = slot;
         el.setAttribute("aria-current", slot === "c" ? "true" : "false");
       });
       shadow.dataset.center = key;
+      dots.forEach(function(d, di){
+        var on = di === idx;
+        d.classList.toggle("on", on); d.setAttribute("aria-selected", on ? "true" : "false");
+      });
       function setCopy(){
-        titleEl.textContent = DATA[key].title; textEl.textContent = DATA[key].text;
-        titleEl.classList.toggle("long", DATA[key].title.length > 13);
+        var d = DATA[key];
+        titleEl.textContent = d.title;
+        titleEl.classList.toggle("long", !d.sub && d.title.length > 12);
+        titleEl.classList.toggle("nosub", !d.sub);
+        subEl.textContent = d.sub || "";
+        textEl.textContent = d.text || "";
+        listEl.classList.toggle("roomy", !!d.roomy);
+        listEl.innerHTML = d.items.map(function(it){
+          return '<li class="mm-li"><div class="mm-ico">' + ICO[it[0]] + '</div><span></span></li>';
+        }).join("");
+        [].slice.call(listEl.querySelectorAll("span")).forEach(function(sp, k){ sp.textContent = d.items[k][1]; });
       }
       if (first){ setCopy(); return; }
       clearTimeout(swapTimer);
       copy.classList.add("swap");
       swapTimer = setTimeout(function(){ setCopy(); copy.classList.remove("swap"); }, 160);
     }
-    function go(delta){ idx = (idx + delta + 3) % 3; render(false); }
+    function go(delta){ idx = (idx + delta + N) % N; render(false); }
     function select(i){
-      var d = (i - idx + 3) % 3;
-      if (d === 1) go(1); else if (d === 2) go(-1);
+      var d = (i - idx + N) % N;
+      if (d === 1) go(1); else if (d === N - 1) go(-1); else if (d) { idx = i; render(false); }
     }
 
     items.forEach(function(el){
@@ -5389,9 +5492,11 @@
       });
     });
 
+    dots.forEach(function(d){ d.addEventListener("click", function(e){ e.stopPropagation(); select(+d.dataset.i); }); });
+
     // swipe / drag left-right anywhere on the stage
     scr.addEventListener("pointerdown", function(e){
-      if (e.target.closest && e.target.closest(".mm-cta")) return;
+      if (e.target.closest && e.target.closest(".mm-cta, .mm-dot")) return;
       swipe = { x: e.clientX, y: e.clientY }; moved = false;
     });
     scr.addEventListener("pointermove", function(e){
