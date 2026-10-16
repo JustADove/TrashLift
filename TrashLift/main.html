@@ -2456,7 +2456,7 @@
 .account-sheet .account-actions button.danger{ color:#009900; border:none; }
 /* ==== Truck & schedule — built on the Truck(16) mock (stage = 865 mock px wide) ==== */
 /* ================= STATISTICS PAGE ================= */
-#screen-stats{ background:linear-gradient(to top right,#6BFD87 0%,#92FB77 45%,#B2F969 100%); }
+#screen-stats{ background:#A8F375 url("assets/co_pattern.png") top center / 100% auto repeat-y; }
 #screen-stats.active{ display:flex; flex-direction:column; min-height:100%; }
 .st-stage{ --u:calc(100cqw / 440); container-type:inline-size; position:relative; flex:1 0 auto; display:flex; flex-direction:column; color:#00A925; font-family:inherit; }
 .st-head{ position:relative; width:100%; aspect-ratio:440 / 163; flex:none; }
@@ -2531,8 +2531,8 @@
 .shell.is-schedule header.topbar,
 .shell.is-schedule nav.tabbar{ display:none; }
 .shell.is-schedule main{ padding:0; }
-#screen-schedule, #screen-co2{ background:#FFFFFF; }
-#screen-schedule.active, #screen-co2.active{ display:flex; flex-direction:column; min-height:100%; }
+#screen-co2{ background:#FFFFFF; }
+#screen-co2.active{ display:flex; flex-direction:column; min-height:100%; }
 .sc-stage{ --u:calc(100cqw / 865); flex:1 0 auto; display:flex; flex-direction:column; position:relative; isolation:isolate; container-type:inline-size; }
 .sc-stage > *{ flex:none; }
 .sc-head{ position:relative; z-index:1; width:100%; aspect-ratio:865 / 380; background:#fff; }
@@ -2624,6 +2624,59 @@
 .sc-sp svg{ display:block; width:100%; height:auto; filter:drop-shadow(0 0 calc(3*var(--u)) #F2C200); }
 .sc-sp.a{ left:calc(645*var(--u)); top:calc(770*var(--u)); }
 .sc-sp.b{ left:calc(730*var(--u)); top:calc(815*var(--u)); width:calc(56*var(--u)); }
+
+/* ==== Truck location & schedule — green glass (Figma "iPhone 16 & 17 Pro Max" schedule mock), same look as Collector view ==== */
+#screen-schedule{ background:#A8F375 url("assets/co_pattern.png") top center / 100% auto repeat-y; }
+#screen-schedule.active{ display:flex; flex-direction:column; min-height:100%; }
+.sc2-stage{ --u:calc(100cqw / 390); --sc-ink:#06721D; container-type:inline-size; position:relative; flex:1 0 auto; display:flex; flex-direction:column; color:var(--sc-ink); font-family:var(--font-display); }
+.sc2-top{ padding:calc(var(--u)*20) calc(var(--u)*14) 0; }
+.sc2-back{ display:flex; align-items:center; justify-content:center; width:calc(var(--u)*44); height:calc(var(--u)*44); padding:0; border-radius:50%; border:1px solid rgba(255,255,255,.7); cursor:pointer; color:var(--sc-ink);
+  background:linear-gradient(145deg, rgba(255,255,255,.6), rgba(255,255,255,.25)); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 calc(var(--u)*6) calc(var(--u)*16) rgba(40,120,20,.2), inset 0 1px 0 rgba(255,255,255,.8); }
+.sc2-back svg{ width:55%; height:55%; fill:none; stroke:currentColor; stroke-width:2.8; stroke-linecap:round; stroke-linejoin:round; }
+.sc2-back:focus-visible{ outline:3px solid var(--sc-ink); outline-offset:3px; }
+.sc2-glass{
+  position:relative; box-sizing:border-box;
+  background:linear-gradient(145deg, rgba(255,255,255,.50), rgba(255,255,255,.20)); border:1px solid rgba(255,255,255,.62);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  box-shadow:0 calc(var(--u)*8) calc(var(--u)*24) rgba(40,120,20,.18), inset 0 1px 0 rgba(255,255,255,.75);
+}
+.sc2-mapcard{ margin:calc(var(--u)*14) calc(var(--u)*14) 0; padding:calc(var(--u)*14); border-radius:calc(var(--u)*30); }
+.sc2-map{ position:relative; isolation:isolate; height:calc(var(--u)*300); border-radius:calc(var(--u)*22); overflow:hidden; background:#EAF3DA; }
+.sc2-map #truckMap{ position:absolute; inset:0; width:100%; height:100%; background:#EAF3DA; }
+.sc2-grab{ position:absolute; z-index:1200; left:50%; bottom:calc(var(--u)*10); transform:translateX(-50%); width:calc(var(--u)*70); height:calc(var(--u)*7); border-radius:999px; background:#E8EBEE; box-shadow:inset 0 1px 2px rgba(60,80,90,.35), 0 1px 0 rgba(255,255,255,.8); pointer-events:none; }
+.sc2-deco{ position:absolute; pointer-events:none; }
+.sc2-deco.sp{ left:calc(var(--u)*20); top:calc(var(--u)*322); width:calc(var(--u)*16); }
+.sc2-deco.bin{ right:calc(var(--u)*10); top:calc(var(--u)*312); width:calc(var(--u)*34); opacity:.85; }
+.sc2-sheet{ margin:calc(var(--u)*38) calc(var(--u)*14) 0; padding:calc(var(--u)*30) calc(var(--u)*20) calc(var(--u)*28); border-radius:calc(var(--u)*30); display:flex; flex-direction:column; gap:calc(var(--u)*18); }
+.sc2-sheet::before{ content:""; position:absolute; left:50%; top:calc(var(--u)*10); transform:translateX(-50%); width:calc(var(--u)*70); height:calc(var(--u)*7); border-radius:999px; background:#E8EBEE; box-shadow:inset 0 1px 2px rgba(60,80,90,.35), 0 1px 0 rgba(255,255,255,.8); }
+.sc2-sheet > h2{ margin:0; text-align:center; font:inherit; font-size:calc(var(--u)*19); font-weight:700; line-height:1.15; text-transform:uppercase; color:var(--sc-ink); }
+.sc2-panel{
+  position:relative; box-sizing:border-box; padding:calc(var(--u)*18) calc(var(--u)*18) calc(var(--u)*20); border-radius:calc(var(--u)*22); background:#E8EBEE;
+  box-shadow:inset 0 calc(var(--u)*2) calc(var(--u)*5) rgba(60,80,90,.2), inset 0 calc(var(--u)*-1) calc(var(--u)*2) rgba(255,255,255,.85), 0 calc(var(--u)*3) calc(var(--u)*8) rgba(30,100,20,.18);
+}
+.sc2-panel h3{ margin:0; font:inherit; font-size:calc(var(--u)*18); font-weight:700; text-transform:uppercase; color:var(--sc-ink); }
+.sc2-eta-val{ margin:calc(var(--u)*10) 0 0; text-align:center; font-size:calc(var(--u)*24); font-weight:700; text-transform:uppercase; color:var(--sc-ink); }
+.sc2-eta-pill{
+  margin:calc(var(--u)*16) 0 0; padding:calc(var(--u)*11) calc(var(--u)*14); border-radius:calc(var(--u)*16); font-size:calc(var(--u)*14); font-weight:700; line-height:1.3; color:var(--sc-ink);
+  background:linear-gradient(135deg,#5BFF8A,#47E872); box-shadow:inset 0 1px 2px rgba(255,255,255,.7), 0 calc(var(--u)*2) calc(var(--u)*7) rgba(30,160,60,.35);
+}
+.sc2-reg{ margin-left:calc(var(--u)*26); }
+.sc2-reg h3{ text-align:center; font-size:calc(var(--u)*21); }
+.sc2-reg-sub{ margin:calc(var(--u)*4) 0 0; text-align:center; font-size:calc(var(--u)*12.5); font-weight:700; line-height:1.3; color:var(--sc-ink); }
+.sc2-rows{ display:flex; flex-direction:column; gap:calc(var(--u)*13); margin-top:calc(var(--u)*16); }
+.sc2-row{
+  position:relative; display:flex; align-items:center; justify-content:space-between; gap:calc(var(--u)*8); box-sizing:border-box; height:calc(var(--u)*42); padding:0 calc(var(--u)*14); border-radius:999px; background:#E8EBEE;
+  box-shadow:inset 0 calc(var(--u)*2) calc(var(--u)*5) rgba(60,80,90,.2), inset 0 calc(var(--u)*-1) calc(var(--u)*2) rgba(255,255,255,.85), 0 calc(var(--u)*2) calc(var(--u)*6) rgba(30,100,20,.16);
+}
+.sc2-row b{ flex:none; font-weight:700; font-size:calc(var(--u)*11); text-transform:uppercase; white-space:nowrap; color:#12A83E; }
+.sc2-row span{ min-width:0; font-weight:700; font-size:calc(var(--u)*13); text-transform:uppercase; white-space:nowrap; color:var(--sc-ink); }
+.sc2-row.off span{ color:#E3231B; }
+.sc2-row::before{
+  content:""; position:absolute; left:calc(var(--u)*-34); top:50%; width:calc(var(--u)*22); height:calc(var(--u)*22); transform:translateY(-50%); border-radius:50%; background:#fff;
+  box-shadow:0 calc(var(--u)*2) calc(var(--u)*5) rgba(30,100,20,.28);
+}
+.sc2-row.today::before{ background:#19D84A; box-shadow:0 0 calc(var(--u)*9) rgba(25,216,74,.9), 0 calc(var(--u)*2) calc(var(--u)*5) rgba(30,100,20,.28); }
+.sc2-end{ flex:none; height:calc(var(--u)*30); }
 
 /* ==== CO2 emissions avoided (prototype chart page) — built on the Truck(07) mock ==== */
 .sc-title.co2-title h2{ font-size:calc(42*var(--u)); }
@@ -3375,7 +3428,7 @@
             </div>
             <div class="au2-field only-worker">
               <label for="authBadge">Badge Number</label>
-              <div class="au2-input"><input type="text" id="authBadge" name="badge" inputmode="numeric" placeholder="000 - 00 - 00" maxlength="14" autocomplete="off"></div>
+              <div class="au2-input"><input type="text" id="authBadge" name="badge" placeholder="000 - 00 - 00" autocomplete="off"></div>
             </div>
             <div class="au2-field">
               <label for="authPassword">Password</label>
@@ -3415,8 +3468,8 @@
             </div>
             <div class="au2-field">
               <label for="authCode">Verification Code from SMS</label>
-              <div class="au2-input"><input type="text" id="authCode" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"></div>
-              <p class="au2-hint">Prototype: no SMS is sent. Any code with 4 or more digits works.</p>
+              <div class="au2-input"><input type="text" id="authCode" name="code" autocomplete="one-time-code"></div>
+              <p class="au2-hint">Prototype: no SMS is sent. You can enter anything, or leave it blank.</p>
             </div>
           </div>
 
@@ -3549,51 +3602,41 @@
     </section>
 
     <!-- TRUCK LOCATIONS & SCHEDULE (public) — built on the Truck(16) mock -->
-    <section class="screen" id="screen-schedule">
-      <div class="tk-stage sc-stage">
-        <img class="co-city" src="assets/co_city.png" alt="" aria-hidden="true" draggable="false">
-        <div class="sc-head">
-          <img class="sc-cloud h1" src="assets/sc_cloud.png" alt="" aria-hidden="true" draggable="false">
-          <img class="sc-cloud h2" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
-          <img class="sc-cloud h3" src="assets/sc_cloud3.png" alt="" aria-hidden="true" draggable="false">
-          <button type="button" class="sc-home" id="scheduleBackBtn" aria-label="Home">Home</button>
-          <div class="sc-card sc-title"><div class="sc-in"><h2>Truck and<br>Schedule</h2></div></div>
+    <section class="screen" id="screen-schedule" aria-label="Truck location and schedule">
+      <div class="sc2-stage">
+        <div class="sc2-top">
+          <button type="button" class="sc2-back" id="scheduleBackBtn" aria-label="Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
         </div>
-        <div class="sc-list">
-          <div class="sc-card sc-mapcard">
-            <div class="sc-map">
-              <div id="truckMap"></div>
-              <div class="sc-live"><span class="live-dot"></span>Live truck location</div>
-              <div class="sc-badge" id="truckBadge"><b>Truck en route</b><span id="truckDetail">Updating…</span></div>
-            </div>
+
+        <div class="sc2-glass sc2-mapcard">
+          <div class="sc2-map">
+            <div id="truckMap"></div>
+            <i class="sc2-grab" aria-hidden="true"></i>
           </div>
-          <div class="sc-card sc-eta">
-            <div class="sc-in">
-              <h3>Estimate<br>Time</h3>
-              <div class="sc-eta-big" id="truckEta">~18 min</div>
-              <div class="sc-eta-meta" id="truckEtaMeta">Near Aguirre Ave.<br>Moving toward President’s Ave.</div>
-            </div>
-          </div>
-          <div class="sc-card sc-reg">
-            <div class="sc-in">
-              <h3>Regular<br>Schedule</h3>
-              <p class="sc-sub">Scheduled collection days for Brgy. BF Homes</p>
-              <div class="sc-rows">
-                <div class="sc-row"><b>Mon · Wed · Fri</b><span>6:00 AM – 11:00 AM</span></div>
-                <div class="sc-row"><b>Tue · Thu</b><span>1:00 PM – 5:00 PM</span></div>
-                <div class="sc-row"><b>Saturday</b><span>7:00 AM – 12:00 NN</span></div>
-                <div class="sc-row off"><b>Sunday</b><span>No regular pickup</span></div>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="sc-co2link" id="co2LinkBtn"><span class="co2-link">CO<sub>2</sub> Emissions<br>Avoided</span></button>
         </div>
-        <img class="sc-cloud c1" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
-        <img class="sc-cloud c2" src="assets/sc_cloud3.png" alt="" aria-hidden="true" draggable="false">
-        <img class="sc-cloud c3" src="assets/sc_cloud.png" alt="" aria-hidden="true" draggable="false">
-        <img class="sc-cloud c4" src="assets/sc_cloud2.png" alt="" aria-hidden="true" draggable="false">
-        <i class="sc-sp a"><svg viewBox='0 0 26 26'><path d='M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z' fill='#FFE84A'/></svg></i><i class="sc-sp b"><svg viewBox='0 0 26 26'><path d='M13 0 16 10 26 13 16 16 13 26 10 16 0 13 10 10Z' fill='#FFE84A'/></svg></i>
-        <img class="co-bushes" src="assets/co_bushes.png" alt="" aria-hidden="true" draggable="false">
+
+        <div class="sc2-glass sc2-sheet">
+          <h2>Truck Location and Schedule</h2>
+
+          <div class="sc2-panel sc2-eta">
+            <h3>Estimate Time</h3>
+            <p class="sc2-eta-val" id="truckEta">~18 min</p>
+            <p class="sc2-eta-pill" id="truckEtaMeta">Near Street Segment 1/10<br>Moving Along The Scheduled BF Homes Route</p>
+          </div>
+
+          <div class="sc2-panel sc2-reg">
+            <h3>Regular Schedule</h3>
+            <p class="sc2-reg-sub">Scheduled Collection Days<br>For Brgy. B.F. Homes</p>
+            <div class="sc2-rows" id="scheduleRows">
+              <div class="sc2-row" data-days="1,3,5"><b>Mon &middot; Wed &middot; Fri</b><span>6:00 AM - 11:00 AM</span></div>
+              <div class="sc2-row" data-days="2,4"><b>Tue &middot; Thu</b><span>1:00 PM - 5:00 PM</span></div>
+              <div class="sc2-row" data-days="6"><b>Saturday</b><span>7:00 AM - 12:00 NN</span></div>
+              <div class="sc2-row off" data-days="0"><b>Sunday</b><span>No Regular Pickup</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sc2-end"></div>
       </div>
     </section>
 
@@ -4379,7 +4422,7 @@
   }
 
   // ---------- log in / sign up (Figma: Log in / Sign up Collector, Verify Collector, Sign up / Log in Pickup) ----------
-  // Prototype rules (same as before): there is no server-side account check. The password is optional and never checked,
+  // Prototype rules (same as before): there is no server-side account check. Nothing is validated: every field is optional and never checked,
   // and the SMS code for collector verification is not actually sent. Accounts only live in this browser.
   var COLLECTORS_KEY = "trashlift-collectors-v1";
 
@@ -4488,7 +4531,7 @@
       }
     }
     var digits = id.replace(/\D/g, "");
-    return "Resident " + digits.slice(-4);
+    return digits ? "Resident " + digits.slice(-4) : "Resident";
   }
 
   function finishAuth(user){
@@ -4505,61 +4548,38 @@
     authMsg("");
     var role = state.pendingRole === "worker" ? "worker" : "resident";
 
+    // Prototype: no validation at all. Anything (even empty fields) is accepted for both residents and collectors.
     if (role === "resident"){
       var raw = authEl("authId").value.trim();
-      var isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(raw);
+      var isEmail = raw.indexOf("@") > 0;
       var digits = raw.replace(/[\s\-()+]/g, "");
-      var isPhone = /^\d{10,13}$/.test(digits);
-      if (!isEmail && !isPhone){
-        authMsg("Enter a valid email or a mobile number (63+).");
-        authEl("authId").focus();
-        return;
-      }
-      finishAuth({ name: niceNameFromId(raw, isEmail), email: isEmail ? raw : "", phone: isPhone ? digits : "", role: "resident" });
+      var isPhone = !isEmail && /^\d+$/.test(digits);
+      var rname = raw ? (isEmail ? niceNameFromId(raw, true) : (isPhone ? niceNameFromId(raw, false) : raw)) : "Resident";
+      finishAuth({ name: rname, email: isEmail ? raw : "", phone: isPhone ? digits : "", role: "resident" });
       return;
     }
 
     // collector
     if (state.authStep === "main"){
-      var badge = authEl("authBadge").value.replace(/\D/g, "");
-      if (badge.length !== 7){
-        authMsg("Enter your 7-digit badge number (000 - 00 - 00).");
-        authEl("authBadge").focus();
-        return;
-      }
+      var badge = authEl("authBadge").value.trim() || "0000000";
       if (state.authMode === "signup"){
         state.authStep = "verify";
         renderAuth(true);
         return;
       }
       var known = readCollectors()[badge];
-      finishAuth({ name: known && known.name ? known.name : "Collector " + formatBadge(badge), email: "", badge: badge, role: "worker" });
+      finishAuth({ name: known && known.name ? known.name : "Collector " + badge, email: "", badge: badge, role: "worker" });
       return;
     }
 
-    // collector verification
+    // collector verification (every field optional)
     var name = authEl("authName").value.trim();
     var birth = authEl("authBirth").value.trim();
     var address = authEl("authAddress").value.trim();
     var phone = authEl("authPhone").value.trim();
-    var code = authEl("authCode").value.replace(/\D/g, "");
-    var checks = [
-      [name, "authName", "Enter your name."],
-      [birth, "authBirth", "Enter your age and birth day."],
-      [address, "authAddress", "Enter your address."],
-      [phone.replace(/\D/g, "").length >= 10 ? phone : "", "authPhone", "Enter a valid mobile number (63+)."],
-      [code.length >= 4 ? code : "", "authCode", "Enter the verification code from the SMS (4 or more digits)."]
-    ];
-    for (var i = 0; i < checks.length; i++){
-      if (!checks[i][0]){
-        authMsg(checks[i][2]);
-        authEl(checks[i][1]).focus();
-        return;
-      }
-    }
-    var badgeNo = authEl("authBadge").value.replace(/\D/g, "");
+    var badgeNo = authEl("authBadge").value.trim() || "0000000";
     writeCollector(badgeNo, { name: name, birth: birth, address: address, phone: phone });
-    finishAuth({ name: name, email: "", badge: badgeNo, role: "worker" });
+    finishAuth({ name: name || ("Collector " + badgeNo), email: "", badge: badgeNo, role: "worker" });
   }
 
   function initAuthForm(){
@@ -4579,10 +4599,6 @@
       pw.type = pw.type === "password" ? "text" : "password";
       syncEye();
       pw.focus();
-    });
-    authEl("authBadge").addEventListener("input", function(){
-      var el = authEl("authBadge");
-      el.value = formatBadge(el.value);
     });
     Array.prototype.forEach.call(document.querySelectorAll("#screen-auth .au2-soc"), function(b){
       b.addEventListener("click", function(){
@@ -4668,6 +4684,8 @@
     var map = L.map("truckMap", {
       zoomControl: true,
       attributionControl: true,
+      scrollWheelZoom: false,          // let the mouse wheel / one-finger swipe scroll the page
+      dragging: !L.Browser.mobile,     // (the truck is a sample simulation, no real GPS)
       maxBounds: BF_HOMES_BOUNDS.pad(0.15),
       maxBoundsViscosity: 1.0,
       minZoom: 14
@@ -4710,6 +4728,13 @@
     }, 3500);
   }
 
+  function markScheduleToday(){
+    var today = String(new Date().getDay());
+    Array.prototype.forEach.call(document.querySelectorAll("#scheduleRows .sc2-row"), function(r){
+      r.classList.toggle("today", r.dataset.days.split(",").indexOf(today) !== -1);
+    });
+  }
+
   function stopTruckSim(){
     if (state.truckTimer){
       clearInterval(state.truckTimer);
@@ -4721,10 +4746,8 @@
     var etaMin = 8 + ((TRUCK_ROUTE.length - state.truckIdx) % TRUCK_ROUTE.length) * 2;
     document.getElementById("truckEta").textContent = "~" + etaMin + " min";
     document.getElementById("truckEtaMeta").innerHTML =
-      "Near street segment " + (state.truckIdx + 1) + "/" + TRUCK_ROUTE.length +
-      "<br>Moving along the scheduled BF Homes route";
-    document.getElementById("truckDetail").textContent =
-      pt[0].toFixed(5) + "°N, " + pt[1].toFixed(5) + "°E";
+      "Near Street Segment " + (state.truckIdx + 1) + "/" + TRUCK_ROUTE.length +
+      "<br>Moving Along The Scheduled BF Homes Route";
   }
 
   function placePin(lat, lng, source){
@@ -6379,6 +6402,7 @@
     if (screenId === "screen-collector") renderCollectorList();
     if (screenId === "screen-request" && state.map) setTimeout(function(){ state.map.invalidateSize(); }, 50);
     if (screenId === "screen-schedule"){
+      markScheduleToday();
       initTruckMap();
       startTruckSim();
       setTimeout(function(){ if (state.truckMap) state.truckMap.invalidateSize(); }, 50);
